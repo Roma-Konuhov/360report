@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var config = require('../config/index');
+var config = require('../config');
 var logger = require('../lib/logger')(module);
 //mongoose.set('debug', true);
 
