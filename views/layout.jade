@@ -6,11 +6,12 @@ html
     meta(name='viewport', content='width=device-width, initial-scale=1')
     title= title
     link(rel='stylesheet', href='/css/main.css')
+    link(rel='stylesheet', href='/vendor/bootstrap/dist/css/bootstrap.css')
   body
     #app!= html
     script.
       window.INITIAL_STATE = !{JSON.stringify(initialState)}
 
-    script(src='/js/lib/jquery.js')
-    script(src='/js/lib/bootstrap.js')
+    script(src='/vendor/jquery/dist/jquery.min.js')
+    script(src='/vendor/bootstrap/dist/js/bootstrap.min.js')
     script(src='/js/bundle.js')

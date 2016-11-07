@@ -1,10 +1,11 @@
 {
-  "name": "raspy-sun",
+  "name": "360report",
   "version": "1.0.0",
-  "description": "My app description",
+  "description": "Generator of 360 review results",
   "scripts": {
     "build": "webpack --display-error-details",
     "postinstall": "npm run build",
+    "prestart": "npm run build",
     "start": "node server.js",
     "test": "npm run test:client && npm run test:server",
     "test:client": "mocha test/client --recursive --compilers js:babel-register",
@@ -20,9 +21,9 @@
     "babel-preset-react": "^6.5.0",
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.15.1",
+    "bower": "^1.7.9",
     "compression": "^1.6.2",
     "cookie-parser": "^1.4.1",
-    "dotenv": "^2.0.0",
     "express": "^4.13.4",
     "express-validator": "^2.20.4",
     "jade": "^1.11.0",
@@ -31,6 +32,8 @@
     "moment": "^2.12.0",
     "mongoose": "^4.4.8",
     "morgan": "^1.7.0",
+    "multer": "^1.2.0",
+    "nconf": "^0.8.4",
     "nodemailer": "^2.3.0",
     "react": "15.1.0",
     "react-cookie": "^0.4.5",
@@ -48,7 +51,8 @@
     "webpack": "^1.12.14",
     "webpack-dev-middleware": "^1.6.1",
     "webpack-hot-middleware": "^2.10.0",
-    "whatwg-fetch": "^0.11.0"
+    "whatwg-fetch": "^0.11.0",
+    "winston": "^2.3.0"
   },
   "devDependencies": {
     "babel-plugin-rewire": "1.0.0-rc-3",

@@ -1,0 +1,26 @@
+{
+  "port": 3000,
+  "mongoose": {
+    "uri": "mongodb://localhost/report",
+    "options": {
+      "server": {
+        "socketOptions": {
+          "keepAlive": 1
+        }
+      }
+    }
+  },
+  "session": {
+    "secret": "SyXmZcdT6vPFeqcs0jaPhdVP",
+    "key": "sid",
+    "cookie": {
+      "path": "/",
+      "secure": false,
+      "httpOnly": true,
+      "maxAge": 0
+    }
+  },
+  "logger": {
+    "file": "logs/debug.log"
+  }
+}
