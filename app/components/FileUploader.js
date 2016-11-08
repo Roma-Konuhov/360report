@@ -8,7 +8,8 @@ class FileUploader extends React.Component {
       loading: false,
       filename: 'No file',
       loaded: false,
-      error: false
+      error: false,
+      timer: true
     }
   }
 
@@ -32,26 +33,32 @@ class FileUploader extends React.Component {
 
   handleChange(e) {
     const self = this;
+    const target = e.target;
 
-    this.setState({ loading: true, filename: e.target.files[0].name });
+    this.setState({ loading: true, filename: e.target.files[0].name, timer: true });
     this.upload(e.target.name, e.target.files[0])
       .then(() => {
+        target.value = '';
         self.setState({ loaded: true, loading: false,  filename: 'No file' });
+        this.timer = setTimeout(() => {
+          this.setState({ timer: false });
+        }, 5000);
       })
       .catch(() => {
+        target.value = '';
         self.setState({ error: true, loading: false,  filename: 'No file' });
       });
   }
 
   render() {
     return (
-      <div className="file-uploader col-sm-6">
+      <div className="file-uploader col-sm-4">
         <form action={this.props.url} encType="multipart/form-data" method="post">
           <label>{this.props.label}</label>
-          <Display if={this.state.loaded} inline="true">
+          <Display if={this.state.loaded && this.state.timer} inline="true">
             <label className="notification success">File has loaded</label>
           </Display>
-          <input className="filestyle" type="file" name="file" onChange={this.handleChange.bind(this)} accept=".csv" />
+          <input className="filestyle" type="file" name={this.props.name} onChange={this.handleChange.bind(this)} accept=".csv" />
         </form>
       </div>
     );
@@ -60,7 +67,8 @@ class FileUploader extends React.Component {
 
 FileUploader.defaultProps = {
   url: '/upload',
-  label: 'File'
+  label: 'File',
+  name: 'file'
 };
 
 export default FileUploader;

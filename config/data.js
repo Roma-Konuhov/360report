@@ -56,3 +56,11 @@ exports.relations = [
   'Peer',
   'Direct Report'
 ];
+
+exports.answers = [
+  'Don`t know',
+  'Strongly Disagree',
+  'Disagree',
+  'Agree',
+  'Strongly Agree'
+];

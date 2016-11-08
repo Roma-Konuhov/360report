@@ -22,7 +22,10 @@
     }
   },
   "logger": {
-    "file": "logs/debug.log"
+    "file": {
+      "info": "logs/info.log",
+      "debug": "logs/debug.log"
+    }
   },
   "upload_directory": "uploads"
 }
