@@ -3,12 +3,12 @@ var async = require('async');
 var logger = require('../lib/logger')(module);
 var _ = require('lodash');
 var ConsultantReport = require('../models/ConsultantReport');
-// var ManagerQuestion = require('../models/ConsultantReport');
+var ManagerReport = require('../models/ManagerReport');
 // var PeopleRelation = require('../models/ConsultantReport');
 
 var FILETYPE_TO_MODEL_MAP = _.zipObject(config.get('upload:fields'), [
   ConsultantReport,
-  'ManagerReport',
+  ManagerReport,
   'PeopleRelation'
 ]);
 

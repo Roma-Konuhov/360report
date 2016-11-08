@@ -26,7 +26,7 @@ var collectionName = 'consultant_reports';
 
 consultantReportSchema.statics.dropCollection = function(cb) {
   mongoose.connection.db.dropCollection(collectionName, function() {
-    logger.info('Collection was dropped');
+    logger.info('Collection "%s" was dropped', collectionName);
   });
   cb(null);
 };
