@@ -1,15 +1,40 @@
 import React from 'react';
+import { IndexLink, Link } from 'react-router';
+import { connect } from 'react-redux';
+import Display from './Display';
 
 class Header extends React.Component {
   render() {
+    const active = { borderBottomColor: '#3f51b5' };
+
     return (
       <nav className="navbar navbar-default navbar-static-top">
         <div className="container">
-          <div className="logo"></div>
+          <div id="navbar" className="navbar-collapse collapse">
+            <IndexLink to="/" className="logo"></IndexLink>
+            <ul className="nav navbar-nav">
+              <Display if={this.props.revieweesByConsultants} nowrap="true">
+                <li><IndexLink to="/reviewees-by-consultants" activeStyle={active}>By Constultans</IndexLink></li>
+              </Display>
+              <Display if={this.props.revieweesByManagers} nowrap="true">
+                <li><Link to="/reviewees-by-managers" activeStyle={active}>By Managers</Link></li>
+              </Display>
+              <Display if={this.props.peopleRelations} nowrap="true">
+                <li><Link to="/people-relations" activeStyle={active}>Relations</Link></li>
+              </Display>
+            </ul>
+          </div>
         </div>
       </nav>
     );
   }
 }
 
-export default Header;
+const mapStateToProps = (state) => {
+  return {
+    token: state.auth.token,
+    user: state.auth.user
+  };
+};
+
+export default connect(mapStateToProps)(Header);

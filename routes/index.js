@@ -1,4 +1,8 @@
 var config = require('../config');
+
+/*
+ * File uploader settings
+ */
 var multer = require('multer');
 var multerStorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -17,9 +21,20 @@ var uploadFields = config.get('upload:fields').map(function(field) {
 });
 var upload = multer({ storage: multerStorage }).fields(uploadFields);
 
-// Controllers
+/*
+ * Controllers
+ */
 var fileController = require('../controllers/file');
+var consultantController = require('../controllers/consultant');
+var managerController = require('../controllers/manager');
+var relationController = require('../controllers/relation');
 
+/*
+ * Routes
+ */
 module.exports = function(app) {
   app.post('/upload', upload, fileController.upload);
+  app.get('/reviewees-by-consultants', upload, consultantController.revieweesGet);
+  app.get('/reviewees-by-managers', upload, managerController.revieweesGet);
+  app.get('/people-relations', upload, relationController.revieweesGet);
 };

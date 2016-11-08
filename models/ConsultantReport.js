@@ -60,6 +60,7 @@ consultantReportSchema.statics.parse = function(filename, cb) {
 };
 
 consultantReportSchema.statics.castAnswers = function(data, cb) {
+  /* TODO: check possibility to replace ConsultantReport with 'this' */
   var answersTextToNumMap = ConsultantReport.mapAnswersTextToNum();
   var collection = [];
   var lcValue;
