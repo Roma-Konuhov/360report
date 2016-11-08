@@ -14,7 +14,10 @@ var db = mongoose.connection.db;
     function(cb) {
       db.collections(function(err, collections) {
         if (collections.find(function(o) { return o.s.name === 'consultant_questions' })) {
-          db.dropCollection('consultant_questions', cb);
+          db.dropCollection('consultant_questions', function() {
+            console.log('collection "consultant_questions" was dropped');
+            cb(null);
+          });
         } else {
           cb(null);
         }
@@ -23,33 +26,38 @@ var db = mongoose.connection.db;
     function(cb) {
       db.collections(function(err, collections) {
         if (collections.find(function(o) { return o.s.name === 'manager_questions' })) {
-          db.dropCollection('manager_questions', cb);
+          db.dropCollection('manager_questions', function() {
+            console.log('collection "manager_questions" was dropped');
+            cb(null);
+          });
         } else {
           cb(null);
         }
       });
     },
     function(cb) {
-      var ConsultantQuestion = mongoose.model('consultant_question', consultantQuestionSchema);
+      var ConsultantQuestion = mongoose.model('ConsultantQuestion', consultantQuestionSchema);
       consultantQuestions.forEach(function(question, idx) {
         new ConsultantQuestion({
           q : 'q' + (idx + 1),
           text: question
         }).save(function() {
           if (idx + 1 === consultantQuestions.length) {
+            console.log('collection "consultant_questions" was created');
             cb();
           }
         });
       });
     },
     function(cb) {
-      var ManagerQeustion = mongoose.model('manager_question', managerQuestionSchema);
+      var ManagerQeustion = mongoose.model('ManagerQuestion', managerQuestionSchema);
       managerQeustions.forEach(function(question, idx) {
         new ManagerQeustion({
           q : 'q' + (idx + 1),
           text: question
         }).save(function() {
           if (idx + 1 === managerQeustions.length) {
+            console.log('collection "manager_questions" was created');
             cb();
           }
         });

@@ -9,7 +9,8 @@
           "keepAlive": 1
         }
       }
-    }
+    },
+    "debug": false
   },
   "session": {
     "secret": "SyXmZcdT6vPFeqcs0jaPhdVP",
@@ -27,5 +28,12 @@
       "debug": "logs/debug.log"
     }
   },
-  "upload_directory": "uploads"
+  "upload": {
+    "directory": "uploads",
+    "fields": [
+      "consultant_report",
+      "manager_report",
+      "people_relations"
+    ]
+  }
 }

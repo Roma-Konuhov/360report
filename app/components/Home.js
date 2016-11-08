@@ -8,8 +8,8 @@ class Home extends React.Component {
     return (
       <div className="container">
         <Messages messages={this.props.messages}/>
-        <FileUploader label="Consultant report (csv file)" name="consultant_questions" />
-        <FileUploader label="Manager report (csv file)" name="manager_questions" />
+        <FileUploader label="Consultant report (csv file)" name="consultant_report" />
+        <FileUploader label="Manager report (csv file)" name="manager_report" />
         <FileUploader label="People relations (csv file)" name="people_relations" />
       </div>
     );

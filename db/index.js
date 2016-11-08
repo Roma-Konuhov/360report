@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 var config = require('../config');
 var logger = require('../lib/logger')(module);
-//mongoose.set('debug', true);
+mongoose.Promise = global.Promise;
+mongoose.set('debug', config.get('mongoose:debug'));
 
 mongoose.connect(config.get('mongoose:uri'), config.get('mongoose:options'));
 mongoose.connection.on('connected', function() {

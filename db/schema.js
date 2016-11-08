@@ -29,7 +29,7 @@ for (var i = 1; i <= consultantQuestions.length; i++) {
 }
 
 var fields = Object.assign({}, reviewFields, questionFields);
-exports.consultantReportSchema = new mongoose.Schema(fields);
+exports.consultantReportSchema = new mongoose.Schema(fields, { collection: 'consultant_reports' });
 
 var questionFields = {};
 for (var i = 1; i <= managerQeustions.length; i++) {
@@ -37,7 +37,7 @@ for (var i = 1; i <= managerQeustions.length; i++) {
 }
 
 var fields = Object.assign({}, reviewFields, questionFields);
-exports.managerReportSchema = new mongoose.Schema(fields);
+exports.managerReportSchema = new mongoose.Schema(fields, { collection: 'manager_reports' });
 
 exports.consultantQuestionSchema = new mongoose.Schema({
   q: {
@@ -48,7 +48,7 @@ exports.consultantQuestionSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-});
+}, { collection: 'consultant_questions' });
 
 exports.managerQuestionSchema = new mongoose.Schema({
   q: {
@@ -59,7 +59,7 @@ exports.managerQuestionSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-});
+}, { collection: 'manager_questions' });
 
 exports.relationshipSchema = new mongoose.Schema({
   reviewee: {

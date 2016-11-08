@@ -6,7 +6,7 @@ var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
 var _ = require('lodash');
 
-var MAP_CSV_TO_DB = {
+var CSV_TO_DB_MAP = {
   'Timestamp': 'timestamp',
   'Username': 'username',
   'Evaluation is for': 'reviewee',
@@ -32,12 +32,23 @@ var validationSchema = {
 
 };
 
+var collectionName = 'consultant_reports';
+
+consultantReportSchema.statics.dropCollection = function(cb) {
+  mongoose.connection.db.dropCollection(collectionName, function() {
+    logger.info('Collection was dropped');
+  });
+  cb(null);
+};
+
 consultantReportSchema.statics.mapAnswersTextToNum = function() {
-  return _.zipObject(answers, _.range(5));
+  var lcAnswers = _.map(answers, function(answer) { return answer.toLowerCase() });
+  return _.zipObject(lcAnswers, _.range(5));
 };
 
 consultantReportSchema.statics.mapAnswersNumToText = function() {
-  return _.zipObject(_.range(5), answers);
+  var lcAnswers = _.map(answers, function(answer) { return answer.toLowerCase() });
+  return _.zipObject(_.range(5), lcAnswers);
 };
 
 consultantReportSchema.statics.validate = function(data, cb) {
@@ -45,43 +56,42 @@ consultantReportSchema.statics.validate = function(data, cb) {
 };
 
 consultantReportSchema.statics.parse = function(filename, cb) {
-  logger.info('parse data from file %s', filename);
-  ReportParser.setMapCsvToDb(MAP_CSV_TO_DB);
+  ReportParser.setMapCsvToDb(CSV_TO_DB_MAP);
   ReportParser.parse(filename, function(err, data) {
     if (err) {
       logger.error(err);
     }
-    logger.info('parsed data: %j', data);
+    logger.info('Data from file "%s" was parsed: %j', filename, data);
     cb(err, data);
   });
 };
 
 consultantReportSchema.statics.castQuestionAnswers = function(data, cb) {
-  logger.info('castQuestionAnswers data %j', data);
   var answersTextToNumMap = ConsultantReport.mapAnswersTextToNum();
   var collection = [];
+  var lcValue;
 
   data.forEach(function(row) {
     var result = {};
     for (var key in row) {
-      if (key.search(/^q\d{1,2}$/)) {
-        result[key] = answersTextToNumMap[row[key]];
+      if (key.search(/^q\d{1,2}$/) !== -1) {
+        lcValue = row[key].toLowerCase();
+        result[key] = answersTextToNumMap[lcValue];
       } else {
         result[key] = row[key];
       }
     }
     collection.push(result);
   });
-  logger.info('casted: %j', collection);
+  logger.info('Values for fields like "qN" were converted to integer according map');
 
   cb(null, collection);
 };
 
-consultantReportSchema.statics.save = function(data, cb) {
-  logger.info('before save %j', data);
+consultantReportSchema.statics.saveCollection = function(data, cb) {
   var collection = [];
-  logger.info('data', data);
-  data.forEach(function(row) {
+
+  data.forEach(function(row, idx) {
     var report = new ConsultantReport(row);
     report.save(function(err, instance) {
       if (err) {
@@ -89,9 +99,11 @@ consultantReportSchema.statics.save = function(data, cb) {
       } else {
         collection.push(instance);
       }
+      if (data.length === idx + 1) {
+        cb(null, collection);
+      }
     });
   });
-  cb(null, collection);
 };
 
 var ConsultantReport = mongoose.model('ConsultantReport', consultantReportSchema);
