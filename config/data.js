@@ -12,8 +12,8 @@ exports.consultantQuestions = [
   'Ensures that customers issues are resolved',
   'Demonstrates strong professional skills & knowledge',
   'I would recommend this person to work with',
-  'I suggest you to...',
-  'I appreciate you for...'
+  'I suggest you to',
+  'I appreciate you for'
 ];
 
 exports.managerQeustions = [
@@ -46,8 +46,8 @@ exports.managerQeustions = [
   'Helps assess skills and create development plan',
   'Conducts coaching and supports as a mentor',
   'I would recommend this person to work with',
-  'I suggest you to...',
-  'I appreciate you for...'
+  'I suggest you to',
+  'I appreciate you for'
 ];
 
 exports.relations = [
