@@ -1,6 +1,6 @@
 var mongoose = require('../db');
 var consultantReportSchema = require('../db/schema').consultantReportSchema;
-var ReportParser = require('./ReportParser');
+var CsvParser = require('./CsvParser');
 var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
@@ -46,8 +46,11 @@ consultantReportSchema.statics.validate = function(data, cb) {
 };
 
 consultantReportSchema.statics.parse = function(filename, cb) {
-  ReportParser.setMapCsvToDb(CSV_TO_DB_MAP);
-  ReportParser.parse(filename, function(err, data) {
+  CsvParser.setCsvToDbMap(CSV_TO_DB_MAP);
+  CsvParser.setFilter(function(row) {
+    return row.username && row.reviewee;
+  });
+  CsvParser.parse(filename, function(err, data) {
     if (err) {
       logger.error(err);
     }
@@ -56,7 +59,7 @@ consultantReportSchema.statics.parse = function(filename, cb) {
   });
 };
 
-consultantReportSchema.statics.castQuestionAnswers = function(data, cb) {
+consultantReportSchema.statics.castAnswers = function(data, cb) {
   var answersTextToNumMap = ConsultantReport.mapAnswersTextToNum();
   var collection = [];
   var lcValue;
@@ -64,6 +67,7 @@ consultantReportSchema.statics.castQuestionAnswers = function(data, cb) {
   data.forEach(function(row) {
     var result = {};
     for (var key in row) {
+      // convert questions(fields with name qN) to its integer representation
       if (key.search(/^q\d{1,2}$/) !== -1) {
         lcValue = row[key].toLowerCase();
         result[key] = answersTextToNumMap[lcValue];

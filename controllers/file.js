@@ -4,12 +4,12 @@ var logger = require('../lib/logger')(module);
 var _ = require('lodash');
 var ConsultantReport = require('../models/ConsultantReport');
 var ManagerReport = require('../models/ManagerReport');
-// var PeopleRelation = require('../models/ConsultantReport');
+var Relation = require('../models/Relation');
 
 var FILETYPE_TO_MODEL_MAP = _.zipObject(config.get('upload:fields'), [
   ConsultantReport,
   ManagerReport,
-  'PeopleRelation'
+  Relation
 ]);
 
 exports.upload = function(req, res, next) {
@@ -28,13 +28,24 @@ exports.upload = function(req, res, next) {
 
       var Model = FILETYPE_TO_MODEL_MAP[fileType];
 
-      async.waterfall([
-        Model.dropCollection,
-        Model.parse.bind(Model, filepath),
-        Model.validate,
-        Model.castQuestionAnswers,
-        Model.saveCollection
-      ], function(err, result) {
+      if (fileType === 'people_relations') {
+        var callStack = [
+          Model.dropCollection,
+          Model.parse.bind(Model, filepath),
+          Model.validate,
+          Model.castRelations,
+          Model.saveCollection
+        ];
+      } else {
+        var callStack = [
+          Model.dropCollection,
+          Model.parse.bind(Model, filepath),
+          Model.validate,
+          Model.castAnswers,
+          Model.saveCollection
+        ];
+      }
+      async.waterfall(callStack, function(err, result) {
         if (err) {
           logger.error(err);
           return res.status(500).json({ status: 'fail', error: err });

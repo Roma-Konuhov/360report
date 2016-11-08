@@ -1,6 +1,6 @@
 var mongoose = require('../db');
 var managerReportSchema = require('../db/schema').managerReportSchema;
-var ReportParser = require('./ReportParser');
+var CsvParser = require('./CsvParser');
 var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
@@ -22,7 +22,7 @@ var validationSchema = {
 
 };
 
-var collectionName = 'consultant_reports';
+var collectionName = 'manager_reports';
 
 managerReportSchema.statics.dropCollection = function(cb) {
   mongoose.connection.db.dropCollection(collectionName, function() {
@@ -33,12 +33,12 @@ managerReportSchema.statics.dropCollection = function(cb) {
 
 managerReportSchema.statics.mapAnswersTextToNum = function() {
   var lcAnswers = _.map(answers, function(answer) { return answer.toLowerCase() });
-  return _.zipObject(lcAnswers, _.range(5));
+  return _.zipObject(lcAnswers, _.range(lcAnswers.length));
 };
 
 managerReportSchema.statics.mapAnswersNumToText = function() {
   var lcAnswers = _.map(answers, function(answer) { return answer.toLowerCase() });
-  return _.zipObject(_.range(5), lcAnswers);
+  return _.zipObject(_.range(lcAnswers.length), lcAnswers);
 };
 
 managerReportSchema.statics.validate = function(data, cb) {
@@ -46,8 +46,11 @@ managerReportSchema.statics.validate = function(data, cb) {
 };
 
 managerReportSchema.statics.parse = function(filename, cb) {
-  ReportParser.setMapCsvToDb(CSV_TO_DB_MAP);
-  ReportParser.parse(filename, function(err, data) {
+  CsvParser.setCsvToDbMap(CSV_TO_DB_MAP);
+  CsvParser.setFilter(function(row) {
+    return row.username && row.reviewee;
+  });
+  CsvParser.parse(filename, function(err, data) {
     if (err) {
       logger.error(err);
     }
@@ -56,7 +59,7 @@ managerReportSchema.statics.parse = function(filename, cb) {
   });
 };
 
-managerReportSchema.statics.castQuestionAnswers = function(data, cb) {
+managerReportSchema.statics.castAnswers = function(data, cb) {
   var answersTextToNumMap = ManagerReport.mapAnswersTextToNum();
   var collection = [];
   var lcValue;

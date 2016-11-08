@@ -61,7 +61,7 @@ exports.managerQuestionSchema = new mongoose.Schema({
   }
 }, { collection: 'manager_questions' });
 
-exports.relationshipSchema = new mongoose.Schema({
+exports.relationSchema = new mongoose.Schema({
   reviewee: {
     type: String,
     required: true
@@ -74,4 +74,4 @@ exports.relationshipSchema = new mongoose.Schema({
     type: Number,
     required: true
   }
-});
+}, { collection: 'relations' });
