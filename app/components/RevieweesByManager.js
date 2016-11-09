@@ -24,13 +24,19 @@ class RevieweesByManager extends Component {
     this.setState({ data: nextProps.revieweesByManagers });
   }
 
+  onRowClick(row, idx, e) {
+    console.log(row, idx, e)
+  }
+
   render() {
     return (
       <div className="container">
         <Table
           data={this.state.data}
           columns={this.columns}
-          propsDbToScreenMap={this.propsDbToScreenMap} />
+          propsDbToScreenMap={this.propsDbToScreenMap}
+          onRowClick={this.onRowClick.bind(this)}
+        />
       </div>
     );
   }

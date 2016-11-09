@@ -39,6 +39,10 @@ footer {
 // Navbar
 // -------------------------
 
+#navbar {
+  text-align: center;
+}
+
 .navbar-default .navbar-nav > li > a {
   border-bottom: 3px solid transparent;
   padding-bottom: (@navbar-padding-vertical - 3);
@@ -64,7 +68,12 @@ footer {
 }
 
 .navbar-default {
+  height: 82px;
+
   .navbar-nav {
+    float: none;
+    display: inline-block;
+
     & > li {
       &.active > a {
         border-bottom-color: #3f51b5;
@@ -83,7 +92,7 @@ footer {
   background: transparent url('../img/logotype.png') no-repeat 0 0;
   width: 200px;
   height: 42px;
-  margin: 20px 205px 20px 0;
+  margin: 20px 0px;
   display: inline-block;
   float: left;
 }

@@ -23,7 +23,7 @@ class Table extends Component {
       <tbody>
       {this.props.data.map((row, idx) => {
         return (
-          <tr key={'row-' + idx}>
+          <tr key={'row-' + idx} onClick={this.props.onRowClick.bind(this, row, idx)}>
             {this.props.columns.map((col, idx) => {
               return (<td key={'col-' + idx}>{row[col]}</td>);
             })}
@@ -45,5 +45,9 @@ class Table extends Component {
     );
   }
 }
+
+Table.defaultProps = {
+  onRowClick: _.identity
+};
 
 export default Table;
