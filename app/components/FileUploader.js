@@ -9,9 +9,15 @@ class FileUploader extends React.Component {
       loading: false,
       filename: 'No file',
       loaded: false,
-      error: false,
-      timer: true
+      error: false
     };
+  }
+
+  componentDidUpdate() {
+    if (this.state.loaded) {
+      //this.props.loadData();
+      window.dispatchEvent(new Event('load:data'));
+    }
   }
 
   upload(fieldname, file) {
@@ -43,6 +49,7 @@ class FileUploader extends React.Component {
 
   componentDidMount() {
     // reinitializing of bootstrap filestyle plugin
+    console.log('FileUploader:componentDidMount ')
     $(':file').filestyle();
   }
 
@@ -50,13 +57,13 @@ class FileUploader extends React.Component {
     const self = this;
     const target = e.target;
 
-    this.setState({ loading: true, filename: e.target.files[0].name, timer: true });
+    this.setState({ loading: true, filename: e.target.files[0].name });
     this.upload(e.target.name, e.target.files[0])
       .then(() => {
         target.value = '';
         self.setState({ loaded: true, loading: false,  filename: 'No file'});
         setTimeout(() => {
-          this.setState({ timer: false });
+          this.setState({ loaded: false });
         }, 4000);
       })
       .catch(() => {
@@ -70,7 +77,7 @@ class FileUploader extends React.Component {
       <div className="file-uploader col-sm-4">
         <form action={this.props.url} encType="multipart/form-data" method="post">
           <label>{this.props.label}</label>
-          <Display if={this.state.loaded && this.state.timer} inline="true">
+          <Display if={this.state.loaded} inline="true">
             <label className="notification success fade-out">File has loaded</label>
           </Display>
           <input className="filestyle" type="file" name={this.props.name} onChange={this.handleChange.bind(this)} accept=".csv" />

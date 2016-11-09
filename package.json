@@ -12,8 +12,6 @@
     "test:server": "mocha test/server --recursive --compilers js:babel-register"
   },
   "dependencies": {
-    "ag-grid": "6.0.x",
-    "ag-grid-react": "6.0.x",
     "async": "^1.5.2",
     "babel-core": "^6.7.2",
     "babel-loader": "^6.2.4",

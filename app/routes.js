@@ -4,6 +4,9 @@ import App from './components/App';
 import Home from './components/Home';
 import Contact from './components/Contact';
 import NotFound from './components/NotFound';
+import RevieweesByManager from './components/RevieweesByManager';
+import RevieweesByConsultant from './components/RevieweesByConsultant';
+import Relations from './components/Relations';
 
 export default function getRoutes(store) {
   const ensureAuthenticated = (nextState, replace) => {
@@ -25,6 +28,9 @@ export default function getRoutes(store) {
     <Route path="/" component={App}>
       <IndexRoute component={Home} onLeave={clearMessages}/>
       <Route path="/contact" component={Contact} onLeave={clearMessages}/>
+      <Route path="/reviewees-by-consultants" component={RevieweesByConsultant} onLeave={clearMessages}/>
+      <Route path="/reviewees-by-managers" component={RevieweesByManager} onLeave={clearMessages}/>
+      <Route path="/people-relations" component={Relations} onLeave={clearMessages}/>
       <Route path="*" component={NotFound} onLeave={clearMessages}/>
     </Route>
   );

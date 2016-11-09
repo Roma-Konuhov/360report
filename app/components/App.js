@@ -10,9 +10,6 @@ class App extends React.Component {
       revieweesByManagers: [],
       peopleRelations: []
     };
-    this.loadRevieweesByConsultants = this.loadRevieweesByConsultants.bind(this);
-    this.loadRevieweesByManagers = this.loadRevieweesByManagers.bind(this);
-    this.loadPeopleRelations = this.loadPeopleRelations.bind(this);
   }
 
   loadData() {
@@ -46,9 +43,7 @@ class App extends React.Component {
   }
 
   loadRevieweesByConsultants() {
-    console.log('loadRevieweesByConsultants')
     return this.fetch('/reviewees-by-consultants').then(data => {
-      console.log('results: ', data)
       this.setState({ revieweesByConsultants: data });
     }, reason => {
       //console.log(reason);
@@ -56,9 +51,7 @@ class App extends React.Component {
   }
 
   loadRevieweesByManagers() {
-    console.log('loadRevieweesByManagers')
     return this.fetch('/reviewees-by-managers').then(data => {
-      console.log('results: ', data)
       this.setState({ revieweesByManagers: data });
     }, reason => {
       //console.log(reason);
@@ -66,9 +59,7 @@ class App extends React.Component {
   }
 
   loadPeopleRelations() {
-    console.log('loadPeopleRelations')
     return this.fetch('/people-relations').then(data => {
-      console.log('results: ', data)
       this.setState({ peopleRelations: data });
     }, reason => {
       //console.log(reason);
@@ -77,10 +68,11 @@ class App extends React.Component {
 
   componentDidMount() {
     this.loadData();
+    window.addEventListener('load:data', this.loadData.bind(this), false);
   }
 
   render() {
-    var props = Object.assign({}, this.state, { loadData: this.loadData });
+    var props = Object.assign({}, this.state, { loadData: this.loadData.bind(this) });
 
     return (
       <div>
