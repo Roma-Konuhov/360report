@@ -23,6 +23,7 @@ class Header extends React.Component {
                 <li><Link to="/people-relations" activeStyle={active}>Relations</Link></li>
               </Display>
             </ul>
+            <div className="review-reports-title"><div className="review-subtitle">360 review</div><div className="reports-subtitle">reports</div></div>
           </div>
         </div>
       </nav>

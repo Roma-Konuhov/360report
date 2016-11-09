@@ -8,7 +8,7 @@
 @brand-success: #29b35b;
 @brand-danger: #b61b17;
 
-@font-family-base: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-base: 'Trebuchet MS', 'Arial', 'sans-serif';
 @headings-font-weight: 600;
 
 html {
@@ -131,4 +131,35 @@ footer {
   -webkit-animation-delay: 3s;
   -moz-animation-delay: 3s;
   animation-delay: 3s;
+}
+
+.review-reports-title {
+  float: right;
+  display: block;
+  padding: 23px 0;
+  line-height: 18px;
+
+  .review-subtitle {
+    font-size: 26px;
+    font-weight: bold;
+  }
+
+  .reports-subtitle {
+    font-size: 18px;
+    text-align: center;
+    -webkit-transform: scale(2.4,1);
+    -moz-transform: scale(2.4,1);
+    -ms-transform: scale(2.4,1);
+    -o-transform: scale(2.4,1);
+    transform: scale(2.4,1);
+  }
+}
+
+.data-table {
+  tr {
+    &:hover {
+      cursor: pointer;
+    }
+
+  }
 }
