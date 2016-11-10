@@ -50,7 +50,9 @@ exports.upload = function(req, res, next) {
           logger.error(err);
           return res.status(500).json({ status: 'fail', error: err });
         }
-        logger.info("%d records were saved in the database", result.length);
+        if (result) {
+          logger.info("%d records were saved in the database", result.length);
+        }
       });
     }
   }

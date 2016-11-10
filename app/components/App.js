@@ -68,7 +68,7 @@ class App extends React.Component {
 
   componentDidMount() {
     this.loadData();
-    window.addEventListener('load:data', this.loadData.bind(this), false);
+    //window.addEventListener('load:data', this.loadData.bind(this), { once: true });
   }
 
   render() {

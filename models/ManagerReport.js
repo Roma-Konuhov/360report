@@ -1,4 +1,5 @@
 var mongoose = require('../db');
+var async = require('async');
 var managerReportSchema = require('../db/schema').managerReportSchema;
 var CsvParser = require('./CsvParser');
 var validator = require('validator');
@@ -6,6 +7,9 @@ var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
 var questions = require('../config/data').managerQeustions;
 var _ = require('lodash');
+var User = require('./User');
+var uniqueBy = require('../helpers/collection').uniqueBy;
+
 
 var CSV_TO_DB_MAP = {
   'Timestamp': 'timestamp',
@@ -82,22 +86,83 @@ managerReportSchema.statics.castAnswers = function(data, cb) {
 };
 
 managerReportSchema.statics.saveCollection = function(data, cb) {
-  var collection = [];
+  var reportCollection = [];
+  var userCollection = [];
 
   data.forEach(function(row, idx) {
     var report = new ManagerReport(row);
-    report.save(function(err, instance) {
+    var email = User.generateEmailByFullname(row.reviewee);
+
+    async.waterfall([
+      function(cb) {
+        report.save(function(err, instance) {
+          if (err) return cb(err);
+          logger.info('push')
+          reportCollection.push(instance);
+          cb(null);
+        });
+      },
+      function(cb) {
+        User.find({email: email}, function(err, user) {
+          if (err) return cb(err);
+          cb(null, user);
+        });
+      },
+      function(found, cb) {
+        logger.info('inside %d', found.length);
+        if (!found.length) {
+          userCollection.push({
+            name: row.reviewee,
+            email: email
+          });
+        }
+        cb(null, null);
+      }
+    ], function(err, result) {
       if (err) {
-        cb(err, null);
-      } else {
-        collection.push(instance);
+        logger.error(err.errmsg);
       }
       if (data.length === idx + 1) {
-        cb(null, collection);
+        var uniqueUserCollection = uniqueBy(userCollection, 'email');
+        var userSaveCalls = [];
+        uniqueUserCollection.forEach(function(userParams) {
+          userSaveCalls.push(function(_cb) {
+            new User(userParams).save(function(err, user) {
+              if (err) {
+                logger.warn(err.errmsg);
+                return _cb(null, null);
+              }
+              _cb(null, user);
+            });
+          })
+        });
+        async.series(userSaveCalls, function(err) {
+          if (err) {
+            logger.error(err.errmsg);
+            return cb(err);
+          }
+          logger.info('Users were saved to database');
+          cb(null, reportCollection);
+        });
       }
     });
   });
 };
+
+managerReportSchema.statics.getReviewees = function(cb) {
+  return this.aggregate([
+    { $group: { _id: "$reviewee", responders_number: { $sum: 1 } }},
+    { $project: { username: "$_id", responders_number: "$responders_number" } }
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('List of reviewees performed by managers was fetched successfully');
+    cb(null, data);
+  });
+};
+
 
 var ManagerReport = mongoose.model('ManagerReport', managerReportSchema);
 
