@@ -1,6 +1,7 @@
 var mongoose = require('../db');
 var relationSchema = require('../db/schema').relationSchema;
 var CsvParser = require('./CsvParser');
+var User = require('./User');
 var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var relations = require('../config/data').relations;
@@ -54,6 +55,17 @@ relationSchema.statics.parse = function(filename, cb) {
   });
 };
 
+relationSchema.statics.addEmailFields = function(data, cb) {
+  var result = [];
+  for (var i in data) {
+    result[i]  = _.clone(data[i]);
+    result[i].responderEmail = User.generateEmailByFullname(data[i].responder);
+    result[i].revieweeEmail = User.generateEmailByFullname(data[i].reviewee);
+  }
+  logger.info('Emails for responder and reviewee were added');
+  cb(null, result);
+};
+
 relationSchema.statics.castRelations = function(data, cb) {
   var relationsTextToNumMap = Relation.mapRelationsTextToNum();
   var collection = [];
@@ -76,6 +88,7 @@ relationSchema.statics.castRelations = function(data, cb) {
   logger.info('Values for fields like "qN" were converted to integer according map');
 
   cb(null, collection);
+
 };
 
 relationSchema.statics.saveCollection = function(data, cb) {

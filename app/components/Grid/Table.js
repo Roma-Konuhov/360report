@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
+import RowWithHandlers from './RowWithHandlers';
 
 class Table extends Component {
   constructor(props) {
@@ -23,11 +24,10 @@ class Table extends Component {
       <tbody>
       {this.props.data.map((row, idx) => {
         return (
-          <tr key={'row-' + idx} onClick={this.props.onRowClick.bind(this, row, idx)}>
-            {this.props.columns.map((col, idx) => {
-              return (<td key={'col-' + idx}>{row[col]}</td>);
-            })}
-          </tr>
+          <RowWithHandlers
+            key={'row-' + idx}
+            row={row}
+            columns={this.props.columns} />
         )
       })}
       </tbody>
@@ -45,9 +45,5 @@ class Table extends Component {
     );
   }
 }
-
-Table.defaultProps = {
-  onRowClick: _.identity
-};
 
 export default Table;

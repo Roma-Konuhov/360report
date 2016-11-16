@@ -12,9 +12,11 @@ class Relations extends Component {
     this.propsDbToScreenMap = {
       'responder': 'Responder',
       'reviewee': 'Reviewee',
-      'relation': 'Relation'
+      'relation': 'Relation',
+      'responderEmail': 'Responder email',
+      'revieweeEmail': 'Reviewee email',
     };
-    this.columns = ['responder', 'reviewee', 'relation'];
+    this.columns = ['responder', 'responderEmail', 'reviewee', 'revieweeEmail', 'relation'];
   }
 
   componentWillMount() {

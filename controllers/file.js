@@ -34,6 +34,7 @@ exports.upload = function(req, res, next) {
           Model.parse.bind(Model, filepath),
           Model.validate,
           Model.castRelations,
+          Model.addEmailFields,
           Model.saveCollection
         ];
       } else {

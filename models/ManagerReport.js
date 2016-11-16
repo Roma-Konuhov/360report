@@ -13,7 +13,7 @@ var uniqueBy = require('../helpers/collection').uniqueBy;
 
 var CSV_TO_DB_MAP = {
   'Timestamp': 'timestamp',
-  'Username': 'username',
+  'Username': 'responder',
   'Evaluation is for': 'reviewee',
   'Share my name': 'allow_to_share'
 };
@@ -52,7 +52,7 @@ managerReportSchema.statics.validate = function(data, cb) {
 managerReportSchema.statics.parse = function(filename, cb) {
   CsvParser.setCsvToDbMap(CSV_TO_DB_MAP);
   CsvParser.setFilter(function(row) {
-    return row.username && row.reviewee;
+    return row.responder && row.reviewee;
   });
   CsvParser.parse(filename, function(err, data) {
     if (err) {

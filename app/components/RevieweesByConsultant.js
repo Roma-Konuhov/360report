@@ -24,8 +24,9 @@ class RevieweesByConsultant extends Component {
     this.setState({ data: nextProps.revieweesByConsultants });
   }
 
-  onRowClick(row, idx, e) {
-    console.log(row, idx, e)
+  onRowClick(row, e) {
+
+    console.log(row, e)
   }
 
   render() {

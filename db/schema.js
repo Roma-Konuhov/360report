@@ -18,7 +18,7 @@ exports.userSchema = new mongoose.Schema({
 
 var reviewFields = {
   timestamp: Date,
-  username: { type: String, required: true },
+  responder: { type: String, required: true },
   reviewee: { type: String, required: true },
   allow_to_share: { type: Boolean, default: false }
 };
@@ -66,7 +66,15 @@ exports.relationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  revieweeEmail: {
+    type: String,
+    required: true
+  },
   responder: {
+    type: String,
+    required: true
+  },
+  responderEmail: {
     type: String,
     required: true
   },
