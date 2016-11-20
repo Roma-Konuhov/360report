@@ -31,3 +31,16 @@ exports.revieweesGet = function(req, res) {
   });
 };
 
+exports.reportGet = function(req, res) {
+  return async.waterfall([
+    ConsultantReport.getReport.bind(null, req.params.id),
+    ConsultantReport.addQuestionText,
+    ConsultantReport.addRelationStr
+  ], function(err, result) {
+    if (err) {
+      return res.status(400).json({status: 'fail', message: err});
+    }
+    res.json({ status: 'ok', data: result });
+  });
+};
+

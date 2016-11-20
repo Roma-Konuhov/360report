@@ -35,7 +35,6 @@ class RevieweesByManager extends Component {
           data={this.state.data}
           columns={this.columns}
           propsDbToScreenMap={this.propsDbToScreenMap}
-          onRowClick={this.onRowClick.bind(this)}
         />
       </div>
     );

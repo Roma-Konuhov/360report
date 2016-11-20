@@ -34,7 +34,9 @@ var relationController = require('../controllers/relation');
  */
 module.exports = function(app) {
   app.post('/upload', upload, fileController.upload);
-  app.get('/reviewees-by-consultants', upload, consultantController.revieweesGet);
-  app.get('/reviewees-by-managers', upload, managerController.revieweesGet);
-  app.get('/people-relations', upload, relationController.revieweesGet);
+  app.get('/reviewees-by-consultants', consultantController.revieweesGet);
+  app.get('/reviewees-by-managers', managerController.revieweesGet);
+  app.get('/people-relations', relationController.revieweesGet);
+  app.get('/consultant-report/:id', consultantController.reportGet);
+  //app.get('/manager-report/:id', managerController.reportGet);
 };

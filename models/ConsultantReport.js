@@ -8,6 +8,7 @@ var answers = require('../config/data').answers;
 var questions = require('../config/data').consultantQuestions;
 var _ = require('lodash');
 var User = require('./User');
+var Relation = require('./Relation');
 var uniqueBy = require('../helpers/collection').uniqueBy;
 
 var CSV_TO_DB_MAP = {
@@ -86,6 +87,14 @@ consultantReportSchema.statics.castAnswers = function(data, cb) {
   cb(null, collection);
 };
 
+consultantReportSchema.methods.addResponderRevieweeRelation = function(report, cb) {
+  return Relation.find({ reviewee: report.reviewee, responderEmail: report.responder }, function(err, instance) {
+    if (err) return cb(err, null);
+    report.relation = instance.relation;
+    cb(null, report);
+  });
+};
+
 consultantReportSchema.statics.saveCollection = function(data, cb) {
   var reportCollection = [];
   var userCollection = [];
@@ -96,7 +105,17 @@ consultantReportSchema.statics.saveCollection = function(data, cb) {
 
     async.waterfall([
       function(cb) {
+        Relation.findOne({ reviewee: row.reviewee, responderEmail: row.responder }, function(err, instance) {
+          if (err) return cb(err, null);
+          if (instance) {
+            report.relation = instance.relation;
+          }
+          cb(null, report);
+        });
+      },
+      function(report, cb) {
         report.save(function(err, instance) {
+          logger.info('report', instance.toObject());
           if (err) return cb(err);
           reportCollection.push(instance);
           cb(null);
@@ -109,7 +128,6 @@ consultantReportSchema.statics.saveCollection = function(data, cb) {
         });
       },
       function(found, cb) {
-        logger.info('inside %d', found.length);
         if (!found.length) {
           userCollection.push({
             name: row.reviewee,
@@ -151,6 +169,8 @@ consultantReportSchema.statics.saveCollection = function(data, cb) {
 
 
 consultantReportSchema.statics.getReviewees = function(cb) {
+  logger.info('Request for list of all reviewees');
+
   return this.aggregate([
     { $group: { _id: "$reviewee", responders_number: { $sum: 1 } }},
     { $project: { username: "$_id", responders_number: "$responders_number" } }
@@ -162,6 +182,85 @@ consultantReportSchema.statics.getReviewees = function(cb) {
     logger.info('List of reviewees performed by consultant was fetched successfully');
     cb(null, data);
   });
+};
+
+consultantReportSchema.statics.getReport = function(id, cb) {
+  logger.info('Request for report for reviewee with ID "%s"', id);
+
+  var groupQuery = {
+    $group: {
+      _id: {relation: '$relation'},
+      num_of_responders: {$sum: 1},
+      responders: {$push: "$responder"}
+    }
+  };
+
+  for (var i = 1; i <= questions.length; i++) {
+    groupQuery['$group']['q' + i] = {$sum: '$q' + i};
+  }
+
+  ConsultantReport.aggregate([
+    {$lookup: {from:'users',localField:'reviewee',foreignField:'name',as:'joined_reviewee'}},
+    {$match:{'joined_reviewee._id': mongoose.Types.ObjectId(id)}},
+    groupQuery,
+  ], function(err, data) {
+      if (err) {
+        logger.error(err);
+        return cb(err, null);
+      }
+      logger.info('Aggregated query to get answers grouped by responders roles was completed successfully');
+      cb(null, data);
+    });
+};
+
+/**
+ * Adds full text for question subfields. I.e. this method
+ * converts question subfield from
+ * { q1: 2 }
+ * to
+ * { q1: {question: <FullQuestionText>, value: 2 }}
+ *
+ * @param {Object} reports
+ * @param cb
+ */
+consultantReportSchema.statics.addQuestionText = function(reports, cb) {
+  logger.info('Adds full text for question subfields, i.e. convert from { q1: 2 } to { q1: {question: FullQuestionText, value: 2 }}');
+
+  var ConsultantQuestion = require('./ConsultantQuestion');
+  ConsultantQuestion.find({}, function(err, questions) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    reports.forEach(function(report) {
+      questions.forEach(function(question) {
+        var answer = report[question.q];
+        report[question.q] = {
+          text: question.text,
+          answer: answer
+        }
+      });
+    });
+    logger.info('Question\'s full text was added successfully');
+    cb(null, reports);
+  });
+};
+/**
+ * Adds additional field "relationStr" which contains text representation of the relation
+ *
+ * @param {Object} reports
+ * @param cb
+ */
+consultantReportSchema.statics.addRelationStr = function(reports, cb) {
+  logger.info('Add field "relationStr" which contains text representations of the relation');
+
+  var relations = Relation.mapRelationsNumToText();
+
+  reports.forEach(function(report) {
+    report.relationStr = relations[report._id.relation];
+  });
+  logger.info('The field "relationStr" was added successfully');
+  cb(null, reports);
 };
 
 

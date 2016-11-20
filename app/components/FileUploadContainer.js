@@ -1,12 +1,17 @@
 import React, { Component } from 'react';
 import FileUploader from './FileUploader';
+import Display from './Display';
 
 class FileUploadContainer extends Component {
   render() {
     return (
       <div id="file-upload-container">
-        <FileUploader label="Consultant report (csv file)" name="consultant_report" {...this.props} />
-        <FileUploader label="Manager report (csv file)" name="manager_report" {...this.props} />
+        <Display if={this.props.peopleRelations} nowrap="true">
+          <FileUploader label="Consultant report (csv file)" name="consultant_report" {...this.props} />
+        </Display>
+        <Display if={this.props.peopleRelations} nowrap="true">
+          <FileUploader label="Manager report (csv file)" name="manager_report" {...this.props} />
+        </Display>
         <FileUploader label="People relations (csv file)" name="people_relations" {...this.props} />
       </div>
     );

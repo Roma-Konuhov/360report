@@ -20,12 +20,13 @@ var reviewFields = {
   timestamp: Date,
   responder: { type: String, required: true },
   reviewee: { type: String, required: true },
-  allow_to_share: { type: Boolean, default: false }
+  allow_to_share: { type: Boolean, default: false },
+  relation: { type: Number, default: -1 }
 };
 
 var questionFields = {};
 for (var i = 1; i <= consultantQuestions.length; i++) {
-  questionFields['q' + i] = { type: Number, min: 0, max: 4 };
+  questionFields['q' + i] = { type: Number, min: 0, max: 4, default: 0 };
 }
 
 var fields = Object.assign({}, reviewFields, questionFields);
@@ -33,7 +34,7 @@ exports.consultantReportSchema = new mongoose.Schema(fields, { collection: 'cons
 
 var questionFields = {};
 for (var i = 1; i <= managerQeustions.length; i++) {
-  questionFields['q' + i] = { type: Number, min: 0, max: 4 };
+  questionFields['q' + i] = { type: Number, min: 0, max: 4, default: 0 };
 }
 
 var fields = Object.assign({}, reviewFields, questionFields);
