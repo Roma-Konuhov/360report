@@ -5,10 +5,11 @@ module.exports = React.createClass({
   componentWillReceiveProps(nextProps) {
     if (!this.chart || !nextProps) return;
 
-    this.chart.series[0].update({
-      data: nextProps.data
-    });
-    this.chart.redraw();
+    // this.chart.series[0].update({
+    //   data: nextProps.data
+    // });
+    // this.chart.redraw();
+    this.chart.series[0].setData(nextProps.data, true);
   },
 
   // When the DOM is ready, create the chart.
@@ -29,7 +30,7 @@ module.exports = React.createClass({
         return this.value && `${self.props.yCategories[this.value]}<br>(${this.value})` || '';
       };
     }
-    this.props.options.series[0] = this.props.data;
+    //this.props.options.series[0] = this.props.data;
     // Extend Highcharts with modules
     if (this.props.modules) {
       this.props.modules.forEach(function (module) {
@@ -41,6 +42,7 @@ module.exports = React.createClass({
       this.props.container,
       this.props.options
     );
+    this.chart.series[0].setData(this.props.data, true);
   },
 
   //Destroy chart before unmount.
