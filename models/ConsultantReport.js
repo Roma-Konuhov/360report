@@ -18,6 +18,8 @@ var CSV_TO_DB_MAP = {
   'Share my name': 'allow_to_share'
 };
 
+var AVG_DECIMAL_PRECISION = 2;
+
 questions.forEach(function(question, idx) {
   CSV_TO_DB_MAP[question] = 'q' + (1 + idx);
 });
@@ -167,7 +169,12 @@ consultantReportSchema.statics.saveCollection = function(data, cb) {
   });
 };
 
-
+/**
+ * Get all unique reviewees from the consultant_report table
+ *
+ * @param cb
+ * @returns {Promise}
+ */
 consultantReportSchema.statics.getReviewees = function(cb) {
   logger.info('Request for list of all reviewees');
 
@@ -184,6 +191,32 @@ consultantReportSchema.statics.getReviewees = function(cb) {
   });
 };
 
+/**
+ * Returns report in format
+ * [
+ *  {
+ *    _.id: { relation: <int> },
+ *    responders: [<string>, <string>, ...],    // list of responders
+ *    answer1: [
+ *      {
+ *        answer: <int>,                        // answer per responder
+ *        responder: <string>
+ *      },
+ *      ...
+ *    ],
+ *    ...
+ *    q1: {
+ *      answer: <int>                           // summary answer per responders with the same role
+ *      text: <string>                          // question label
+ *    },
+ *    ...
+ *  }
+ * ...
+ * ]
+ *
+ * @param {Number} id
+ * @param {Function} cb
+ */
 consultantReportSchema.statics.getReport = function(id, cb) {
   logger.info('Request for report for reviewee with ID "%s"', id);
 
@@ -197,12 +230,14 @@ consultantReportSchema.statics.getReport = function(id, cb) {
 
   for (var i = 1; i <= questions.length; i++) {
     groupQuery['$group']['q' + i] = {$sum: '$q' + i};
+    groupQuery['$group']['answers' + i] = {$push: {answer: '$q' + i, responder: "$responder"}};
   }
 
   ConsultantReport.aggregate([
     {$lookup: {from:'users',localField:'reviewee',foreignField:'name',as:'joined_reviewee'}},
     {$match:{'joined_reviewee._id': mongoose.Types.ObjectId(id)}},
     groupQuery,
+    {$sort: {'_id.relation': 1}}
   ], function(err, data) {
       if (err) {
         logger.error(err);
@@ -221,7 +256,7 @@ consultantReportSchema.statics.getReport = function(id, cb) {
  * { q1: {question: <FullQuestionText>, value: 2 }}
  *
  * @param {Object} reports
- * @param cb
+ * @param {Function} cb
  */
 consultantReportSchema.statics.addQuestionText = function(reports, cb) {
   logger.info('Adds full text for question subfields, i.e. convert from { q1: 2 } to { q1: {question: FullQuestionText, value: 2 }}');
@@ -245,11 +280,12 @@ consultantReportSchema.statics.addQuestionText = function(reports, cb) {
     cb(null, reports);
   });
 };
+
 /**
  * Adds additional field "relationStr" which contains text representation of the relation
  *
  * @param {Object} reports
- * @param cb
+ * @param {Function} cb
  */
 consultantReportSchema.statics.addRelationStr = function(reports, cb) {
   logger.info('Add field "relationStr" which contains text representations of the relation');
@@ -261,6 +297,97 @@ consultantReportSchema.statics.addRelationStr = function(reports, cb) {
   });
   logger.info('The field "relationStr" was added successfully');
   cb(null, reports);
+};
+
+/**
+ * Input data is grouped by responders. This method regroups data by questions.
+ * Output:
+ * [
+ *  {
+ *    text: <question in text form>
+ *    [
+ *      relation: {
+   *      name: 'Line manager',
+   *      num_of_responders: 2,
+   *      sum_answer: 5,
+   *      answers: [{responder: 'auser@cogn.com', answer: 1}, {responder: 'buser@cogn.com', answer: 4}]
+   *
+   *    },
+ *    ...
+ *    ]
+ *  },
+ *  ...
+ * ]
+ *
+ * @param {Object} reports
+ * @param {Function} cb
+ */
+consultantReportSchema.statics.regroupByQuestions = function(reports, cb) {
+};
+
+/**
+ * Input data is grouped by responders. This method regroups data by series.
+ * Output:
+ * [
+ *  {
+ *    text: <question in text form>
+ *    relationLabels: ['Self-evaluation', 'Manager', 'Line manager', 'Peer', 'Direct report'],
+ *    answerLabels: ['Don`t know', 'Strongly Disagree', 'Disagree', 'Agree', 'Strongly Agree'],
+ *    answers: [ 5, 1, 0, 3, 6 ],
+ *    avgAnswers: [2.5, 0.5, 0, 1.5, 3]
+ *  },
+ *  ...
+ * ]
+ *
+ * @param {Object} reports
+ * @param {Function} cb
+ */
+consultantReportSchema.statics.regroupBySeries = function(reports, cb) {
+  logger.info('Regrouping data by series');
+
+  var relationLabels = Object.values(Relation.mapRelationsNumToText());
+  var answerLabels = Object.values(ConsultantReport.mapAnswersNumToText());
+  var ConsultantQuestion = require('./ConsultantQuestion');
+  var result = [];
+  var qObject = {};
+
+  ConsultantQuestion.find({}, function(err, questions) {
+    questions.forEach(function(question) {
+      var sumAnswer = 0;
+      var avgAnswer = 0;
+      var orderIdx;
+      qObject = {
+        text: question.text,
+        relationLabels: relationLabels,
+        answerLabels: answerLabels,
+        answers: {},
+        avgAnswers: {}
+      };
+      reports.forEach(function(report) {
+        // skip reports of responders who doesn't have any relation with reviewee
+        if (report._id.relation !== -1) {
+          sumAnswer = report[question.q];
+          avgAnswer = parseFloat((sumAnswer / report.num_of_responders).toFixed(AVG_DECIMAL_PRECISION));
+          orderIdx = report._id.relation;
+          qObject['answers'][orderIdx] = sumAnswer;
+          qObject['avgAnswers'][orderIdx] = avgAnswer;
+        } else {
+          logger.warn('Responders %j were skipped since they don\'t stand in any relation with reviewee', report.responders);
+        }
+      });
+      // fill answers for missed roles
+      for (var i = 0; i < relationLabels.length; i ++) {
+        if (_.isUndefined(qObject['answers'][i])) {
+          qObject['answers'][i] = qObject['avgAnswers'][i] = 0;
+        }
+      }
+      qObject['answers'] = Object.values(qObject['answers']);
+      qObject['avgAnswers'] = Object.values(qObject['avgAnswers']);
+      result.push(qObject);
+    });
+    logger.info('The regrouping by series is finished successfully');
+    cb(null, result);
+  });
 };
 
 

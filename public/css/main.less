@@ -35,6 +35,14 @@ footer {
   border-top: 1px solid #e0e0e0;
 }
 
+h1 {
+  text-align: center;
+  margin: 21px 0 36px;
+}
+
+h2 {
+  margin-top: 0;
+}
 
 // Navbar
 // -------------------------
@@ -171,4 +179,55 @@ footer {
     }
 
   }
+}
+
+.user-data {
+  display: inline-block;
+  width: 40%;
+  float: left;
+}
+
+.info-block {
+  display: inline-block;
+  width: 60%;
+}
+
+.highcharts-title tspan {
+  width: 200px;
+}
+
+.chart-block {
+  margin: 30px 0 60px;
+  border-bottom: 3px solid #000;
+  position: relative;
+  overflow: hidden;
+
+  &:before {
+    position: absolute;
+    z-index: 10;
+    top: 43px;
+    content: ' ';
+    display: block;
+    width: 100%;
+    height: 3px;
+    background: #000;
+  }
+
+  .chart-wrapper {
+    width: 70%;
+    float: right;
+  }
+
+  .title {
+    font-family: "Trebuchet MS";
+    font-size: 20px;
+    font-weight: bold;
+    width: 300px;
+    position: absolute;
+    top: 200px;
+  }
+}
+
+.highcharts-container {
+  width: 50%;
 }

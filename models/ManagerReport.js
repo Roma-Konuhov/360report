@@ -18,6 +18,8 @@ var CSV_TO_DB_MAP = {
   'Share my name': 'allow_to_share'
 };
 
+var AVG_DECIMAL_PRECISION = 2;
+
 questions.forEach(function(question, idx) {
   CSV_TO_DB_MAP[question] = 'q' + (1 + idx);
 });
@@ -149,6 +151,12 @@ managerReportSchema.statics.saveCollection = function(data, cb) {
   });
 };
 
+/**
+ * Get all unique reviewees from the consultant_report table
+ *
+ * @param cb
+ * @returns {Promise}
+ */
 managerReportSchema.statics.getReviewees = function(cb) {
   return this.aggregate([
     { $group: { _id: "$reviewee", responders_number: { $sum: 1 } }},
