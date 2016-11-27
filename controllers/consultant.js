@@ -45,3 +45,11 @@ exports.reportGet = function(req, res) {
   });
 };
 
+exports.statisticsGet = function(req, res) {
+  ConsultantReport.getStatistics(req.params.id, function(err, result) {
+    if (err) {
+      return res.status(400).json({satus: 'fail', message: err});
+    }
+    res.json({status: 'ok', data: result})
+  });
+};

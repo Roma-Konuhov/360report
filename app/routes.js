@@ -5,7 +5,7 @@ import Home from './components/Home';
 import Contact from './components/Contact';
 import NotFound from './components/NotFound';
 import RevieweesByManager from './components/RevieweesByManager';
-import RevieweesByConsultant from './components/RevieweesByConsultant';
+import RevieweesByConsultant from './components/RevieweeByConsultant';
 import Relations from './components/Relations';
 import Report from './components/Report';
 

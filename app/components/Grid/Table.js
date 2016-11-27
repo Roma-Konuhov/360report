@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
-import RowWithHandlers from './RowWithHandlers';
+import Row from './Row';
 
 class Table extends Component {
   constructor(props) {
@@ -20,11 +19,15 @@ class Table extends Component {
   }
 
   renderBody() {
+    if (!this.props.data || !this.props.data.length) {
+      return null;
+    }
+
     return (
       <tbody>
       {this.props.data.map((row, idx) => {
         return (
-          <RowWithHandlers
+          <Row
             key={'row-' + idx}
             row={row}
             columns={this.props.columns} />
@@ -35,15 +38,30 @@ class Table extends Component {
   }
 
   render() {
+    let styles = 'data-table table';
+    if (this.props.hoverable) {
+      styles += ' table-hover';
+    }
+
     return (
-      <div className="container">
-        <table className="data-table table table-hover">
-          {this.renderHeader()}
-          {this.renderBody()}
-        </table>
-      </div>
+      <table className={styles}>
+        {this.renderHeader()}
+        {this.renderBody()}
+      </table>
     );
   }
 }
 
+Table.propTypes = {
+  data: React.PropTypes.array,
+  columns: React.PropTypes.array,
+  propsDbToScreenMap: React.PropTypes.object,
+  hoverable: React.PropTypes.bool
+};
+
+Table.defaultProps = {
+  hoverable: false
+};
+
 export default Table;
+export {Table as BaseTable};

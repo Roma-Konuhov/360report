@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import Table from './Grid/Table';
+import Table from '../Grid/Table';
 
-class RevieweesByConsultant extends Component {
+class RevieweesByManager extends Component {
   constructor(props) {
     super(props);
 
@@ -17,16 +17,15 @@ class RevieweesByConsultant extends Component {
   }
 
   componentWillMount() {
-    this.setState({ data: this.props.revieweesByConsultants });
+    this.setState({ data: this.props.revieweesByManagers });
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ data: nextProps.revieweesByConsultants });
+    this.setState({ data: nextProps.revieweesByManagers });
   }
 
-  onRowClick(row, e) {
-
-    console.log(row, e)
+  onRowClick(row, idx, e) {
+    console.log(row, idx, e)
   }
 
   render() {
@@ -36,10 +35,11 @@ class RevieweesByConsultant extends Component {
           data={this.state.data}
           columns={this.columns}
           propsDbToScreenMap={this.propsDbToScreenMap}
+          hoverable="true"
         />
       </div>
     );
   }
 }
 
-export default RevieweesByConsultant;
+export default RevieweesByManager;

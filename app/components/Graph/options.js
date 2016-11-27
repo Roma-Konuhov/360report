@@ -11,7 +11,7 @@ module.exports = {
     showAxes: true,
     marginLeft: 150,
     marginRight: 50,
-    marginBottom: 0,
+    marginBottom: 30,
     spacingBottom: 0,
     spacingLeft: 0,
     spacingRight: 0,

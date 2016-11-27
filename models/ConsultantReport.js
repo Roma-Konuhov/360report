@@ -18,7 +18,7 @@ var CSV_TO_DB_MAP = {
   'Share my name': 'allow_to_share'
 };
 
-var AVG_DECIMAL_PRECISION = 2;
+var AVG_DECIMAL_PRECISION = 1;
 
 questions.forEach(function(question, idx) {
   CSV_TO_DB_MAP[question] = 'q' + (1 + idx);
@@ -196,6 +196,7 @@ consultantReportSchema.statics.getReviewees = function(cb) {
  * [
  *  {
  *    _.id: { relation: <int> },
+ *    num_of_responders: <int>,
  *    responders: [<string>, <string>, ...],    // list of responders
  *    answer1: [
  *      {
@@ -214,11 +215,11 @@ consultantReportSchema.statics.getReviewees = function(cb) {
  * ...
  * ]
  *
- * @param {Number} id
+ * @param {Number} userId
  * @param {Function} cb
  */
-consultantReportSchema.statics.getReport = function(id, cb) {
-  logger.info('Request for report for reviewee with ID "%s"', id);
+consultantReportSchema.statics.getReport = function(userId, cb) {
+  logger.info('Request for report for reviewee with ID "%s"', userId);
 
   var groupQuery = {
     $group: {
@@ -235,7 +236,7 @@ consultantReportSchema.statics.getReport = function(id, cb) {
 
   ConsultantReport.aggregate([
     {$lookup: {from:'users',localField:'reviewee',foreignField:'name',as:'joined_reviewee'}},
-    {$match:{'joined_reviewee._id': mongoose.Types.ObjectId(id)}},
+    {$match:{'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
     groupQuery,
     {$sort: {'_id.relation': 1}}
   ], function(err, data) {
@@ -334,7 +335,8 @@ consultantReportSchema.statics.regroupByQuestions = function(reports, cb) {
  *    relationLabels: ['Self-evaluation', 'Manager', 'Line manager', 'Peer', 'Direct report'],
  *    answerLabels: ['Don`t know', 'Strongly Disagree', 'Disagree', 'Agree', 'Strongly Agree'],
  *    answers: [ 5, 1, 0, 3, 6 ],
- *    avgAnswers: [2.5, 0.5, 0, 1.5, 3]
+ *    avgAnswers: [2.5, 0.5, 0, 1.5, 3],
+ *    respondersNumber: [1, 3, 2, 5, 1]
  *  },
  *  ...
  * ]
@@ -361,7 +363,8 @@ consultantReportSchema.statics.regroupBySeries = function(reports, cb) {
         relationLabels: relationLabels,
         answerLabels: answerLabels,
         answers: {},
-        avgAnswers: {}
+        avgAnswers: {},
+        respondersNumber: {}
       };
       reports.forEach(function(report) {
         // skip reports of responders who doesn't have any relation with reviewee
@@ -371,6 +374,7 @@ consultantReportSchema.statics.regroupBySeries = function(reports, cb) {
           orderIdx = report._id.relation;
           qObject['answers'][orderIdx] = sumAnswer;
           qObject['avgAnswers'][orderIdx] = avgAnswer;
+          qObject['respondersNumber'][orderIdx] = report.num_of_responders;
         } else {
           logger.warn('Responders %j were skipped since they don\'t stand in any relation with reviewee', report.responders);
         }
@@ -378,11 +382,12 @@ consultantReportSchema.statics.regroupBySeries = function(reports, cb) {
       // fill answers for missed roles
       for (var i = 0; i < relationLabels.length; i ++) {
         if (_.isUndefined(qObject['answers'][i])) {
-          qObject['answers'][i] = qObject['avgAnswers'][i] = 0;
+          qObject['answers'][i] = qObject['avgAnswers'][i] = qObject['respondersNumber'][i] = 0;
         }
       }
       qObject['answers'] = Object.values(qObject['answers']);
       qObject['avgAnswers'] = Object.values(qObject['avgAnswers']);
+      qObject['respondersNumber'] = Object.values(qObject['respondersNumber']);
       result.push(qObject);
     });
     logger.info('The regrouping by series is finished successfully');
@@ -390,51 +395,168 @@ consultantReportSchema.statics.regroupBySeries = function(reports, cb) {
   });
 };
 
+/**
+ * Returns statistics for each question for a specific person
+ * [
+ *   {
+ *     self_score: <float>,
+ *     avg_score: <float>, // avg score without self assessment
+ *     avg_norm:  <float>, // avg score based on all answers
+ *     self_gap: <float>,  // self_score - avg_score
+ *     avg_gap: <float>    // avg_norm - avg_score
+ *   },
+ *   ...
+ * ]
+ *
+ * @param userId
+ * @param {Function} cb
+ */
+consultantReportSchema.statics.getStatistics = function(userId, cb) {
+  logger.info('Get statistics for person with ID "%s"', userId);
+  async.parallel({
+     selfAvg:  this.getAvgAnswersForReviewee.bind(this, userId),
+     respondersAvg: this.getAvgAnswersByResponders.bind(this, userId),
+     companyAvg: this.getAvgAnswersByCompany
+  }, function(err, results) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Statistics for a person "%s" was gathered successfully', userId);
+
+    var data = [], selfScore, avgScore, avgNorm;
+    for (var i = 1; i <= questions.length; i++) {
+      selfScore = results.selfAvg.length ? results.selfAvg[0]['q' + i] : 0;
+      avgScore = results.respondersAvg.length ? results.respondersAvg[0]['avg_score' + i] : 0;
+      avgNorm = results.companyAvg.length ? results.companyAvg[0]['avg_norm' + i] : 0;
+
+      selfScore = selfScore.toFixed(AVG_DECIMAL_PRECISION);
+      avgScore = avgScore.toFixed(AVG_DECIMAL_PRECISION);
+      avgNorm = avgNorm.toFixed(AVG_DECIMAL_PRECISION);
+
+      data.push({
+        self_score: selfScore,
+        avg_score: avgScore,
+        avg_norm: avgNorm,
+        self_gap: (selfScore - avgScore).toFixed(AVG_DECIMAL_PRECISION),
+        avg_gap: (avgNorm - avgScore).toFixed(AVG_DECIMAL_PRECISION)
+      });
+    }
+    cb(null, data);
+  });
+};
+
+/**
+ * Returns average answers of all responders for a specific person, excluding himself
+ * [
+ *   { _id: 1,
+ *     avg_score1: <float>,
+ *     avg_score1: <float>,
+ *     ...
+ *   },
+ *   ...
+ * ]
+ *
+ * @param userId
+ * @param {Function} cb
+ */
+consultantReportSchema.statics.getAvgAnswersByResponders = function(userId, cb) {
+  logger.info('Aggregated query to get average answers of all responders for for a person with ID "%s", excluding reviewee', userId);
+
+  var groupQuery = {
+    $group: { _id: null }
+  };
+
+  for (var i = 1; i <= questions.length; i++) {
+    groupQuery['$group']['avg_score' + i] = {$avg: '$q' + i};
+  }
+
+  ConsultantReport.aggregate([
+    {$lookup: {from: 'users', localField: 'reviewee', foreignField: 'name', as: 'joined_reviewee'}},
+    {$match: {'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
+    {'$unwind': '$joined_reviewee'},
+    {$redact: {$cond: [{$ne:['$responder','$joined_reviewee.email']},'$$KEEP','$$PRUNE']}},
+    groupQuery
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get average answers of all responders for a person, excluding reviewee, was completed successfully');
+    cb(null, data);
+  });
+};
+
+/**
+ * Returns average answers for a specific person
+ * [
+ *   { _id: 1,
+ *     self_score1: <float>,
+ *     self_score1: <float>,
+ *     ...
+ *   },
+ *   ...
+ * ]
+ *
+ * @param userId
+ * @param {Function} cb
+ */
+consultantReportSchema.statics.getAvgAnswersForReviewee = function(userId, cb) {
+  logger.info('Aggregated query to get average answers for a person with ID "%s", excluding himself', userId);
+
+  ConsultantReport.aggregate([
+    {$lookup: {from: 'users', localField: 'reviewee', foreignField: 'name', as: 'joined_reviewee'}},
+    {$match: {'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
+    {'$unwind': '$joined_reviewee'},
+    {$redact: {$cond: [{$eq:['$responder','$joined_reviewee.email']},'$$KEEP','$$PRUNE']}}
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get average answers for a person, excluding himself, was completed successfully');
+    cb(null, data);
+  });
+};
+
+/**
+ * Returns average answers of all people in the company
+ * [
+ *   { _id: 1,
+ *     avg_norm2: <float>,
+ *     avg_norm2: <float>,
+ *     ...
+ *   },
+ *   ...
+ * ]
+ *
+ * @param {Function} cb
+ */
+consultantReportSchema.statics.getAvgAnswersByCompany = function(cb) {
+  logger.info('Aggregated query to get average answers of all people in the company');
+
+  var groupQuery = {
+    $group: { _id: null }
+  };
+
+  for (var i = 1; i <= questions.length; i++) {
+    groupQuery['$group']['avg_norm' + i] = {$avg: '$q' + i};
+  }
+
+  ConsultantReport.aggregate([
+    groupQuery
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get average answers of all people in the company was completed successfully');
+    cb(null, data);
+  });
+};
+
+
 
 var ConsultantReport = mongoose.model('ConsultantReport', consultantReportSchema);
 
 module.exports = ConsultantReport;
-
-/*
-* async.waterfall([
- function(cb) {
- report.save(function(err, instance) {
- if (err) return cb(err);
- logger.info('push')
- collection.push(instance);
- cb(null);
- });
- },
- function(cb) {
- User.find({email: email}, function(err, user) {
- if (err) return cb(err);
- cb(null, user);
- });
- },
- function(found, cb) {
- logger.info('inside %d', found.length);
- if (!found.length) {
- new User({
- name: row.reviewee,
- email: email
- }).save(function(err, user) {
- if (err) {
- logger.warn(err.errmsg);
- return cb(err);
- }
- logger.info('saved from inside %s', user.name);
- cb(null, user);
- });
- } else {
- cb(null, null);
- }
- }
- ], function(err, result) {
- if (err) {
- logger.error(err.errmsg);
- }
- if (data.length === idx + 1) {
- cb(null, collection);
- }
- });
-* */

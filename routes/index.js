@@ -36,6 +36,7 @@ var userController = require('../controllers/user');
 module.exports = function(app) {
   app.post('/upload', upload, fileController.upload);
   app.get('/user/:id', userController.userGet);
+  app.get('/statistics/:id', consultantController.statisticsGet);
   app.get('/reviewees-by-consultants', consultantController.revieweesGet);
   app.get('/reviewees-by-managers', managerController.revieweesGet);
   app.get('/people-relations', relationController.revieweesGet);

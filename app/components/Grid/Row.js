@@ -7,7 +7,7 @@ class Row extends Component {
     return (
       <tr>
         {this.props.columns.map((col, idx) => {
-          return (<Cell key={'cell-' + idx} value={this.props.row[col]} />);
+          return (<Cell key={'cell-' + idx} className={col} value={this.props.row[col]} />);
         })}
       </tr>
     );
@@ -24,3 +24,4 @@ Row.propTypes = {
 };
 
 export default Row;
+export { Row as BaseRow };

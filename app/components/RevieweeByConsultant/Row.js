@@ -1,9 +1,8 @@
 import React from 'react';
-import Router from 'react-router';
-import Row from './Row';
-import Cell from './Cell';
+import { BaseRow } from '../Grid/Row';
+import Cell from '../Grid/Cell';
 
-class RowWithHandlers extends Row {
+class Row extends BaseRow {
   constructor(props) {
     super(props);
   }
@@ -17,16 +16,16 @@ class RowWithHandlers extends Row {
     return (
       <tr onClick={this.onRowClick.bind(this, this.props.row)}>
         {this.props.columns.map((col, idx) => {
-          return (<Cell key={'cell-' + idx} value={this.props.row[col]} />);
+          return (<Cell key={'cell-' + idx} className={col} value={this.props.row[col]} />);
         })}
       </tr>
     );
   }
 }
 
-RowWithHandlers.contextTypes = {
+Row.contextTypes = {
   router: React.PropTypes.object.isRequired
 };
 
 
-export default RowWithHandlers;
+export default Row;
