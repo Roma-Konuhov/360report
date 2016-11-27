@@ -1,8 +1,9 @@
+var _ = require('lodash');
+var fs = require('fs');
+var async = require('async');
 var config = require('../config');
 var HttpError = require('../lib/error').HttpError;
-var async = require('async');
 var logger = require('../lib/logger')(module);
-var _ = require('lodash');
 var ConsultantReport = require('../models/ConsultantReport');
 var ManagerReport = require('../models/ManagerReport');
 var Relation = require('../models/Relation');
@@ -14,8 +15,6 @@ var FILETYPE_TO_MODEL_MAP = _.zipObject(config.get('upload:fields'), [
 ]);
 
 exports.upload = function(req, res, next) {
-    console.log('uplad',  req.files)
-
   for (var fileType in FILETYPE_TO_MODEL_MAP) {
     if (req.files[fileType] && req.files[fileType][0]) {
       logger.info('File ' + req.files[fileType][0].originalname + ' was uploaded');
@@ -54,6 +53,11 @@ exports.upload = function(req, res, next) {
         }
         if (result) {
           logger.info("%d records were saved in the database", result.length);
+          if (config.get('upload:removeAfterProcessing')) {
+            fs.unlink(filepath, function(err) {
+              logger.info('CSV file "%s" was removed', filepath);
+            });
+          }
         }
       });
     }

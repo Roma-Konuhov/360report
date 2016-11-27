@@ -30,6 +30,7 @@
   },
   "upload": {
     "directory": "uploads",
+    "removeAfterProcessing": true,
     "fields": [
       "consultant_report",
       "manager_report",
