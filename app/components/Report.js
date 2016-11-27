@@ -1,46 +1,10 @@
 import React from 'react';
-import _ from 'lodash';
-import { fetch } from '../helpers/ajax';
 import Chart from './Graph/Highcharts.react';
-import ChartOptions from './Graph/options';
 import InfoBlock from './InfoBlock';
 import UserData from './UserData';
 import Statistics from './Statistics';
 
 class Report extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      reports: [],
-      statistics: []
-    };
-  }
-
-  loadReports() {
-    var id = this.props.params.id;
-
-    return fetch(`/consultant-report/${id}`).then(reports => {
-      this.setState({ reports: reports });
-    }, reason => {
-      //console.log(reason);
-    });
-  }
-
-  loadStatisctics() {
-    var id = this.props.params.id;
-
-    return fetch(`/statistics/${id}`).then(statistics => {
-      this.setState({ statistics: statistics });
-    }, reason => {
-      //console.log(reason);
-    });
-  }
-
-  componentDidMount() {
-    this.loadReports();
-    this.loadStatisctics();
-  }
-
   getXCategories(relationLabels, respondersNumber) {
     return relationLabels.map((label, idx) => {
       return `${label} (${respondersNumber[idx]})`;
@@ -89,12 +53,12 @@ class Report extends React.Component {
     return (
       <div className="container">
         <h1>360&deg; Feedback Report</h1>
-        <UserData id={this.props.params.id} />
+        <UserData id={this.props.userId} />
         <InfoBlock />
-        {this.state.reports.map((report, idx) => {
+        {this.props.reports.map((report, idx) => {
           return (
             <div key={`chart-wrapper-${idx}`} className="chart-block">
-              <Statistics data={this.state.statistics[idx]} />
+              <Statistics data={this.props.statistics[idx]} />
               <div className="title">{report.text}</div>
               <div className="chart-wrapper">
               <Chart
@@ -102,7 +66,7 @@ class Report extends React.Component {
                 data={this.getFormattedData(report.avgAnswers)}
                 xCategories={this.getXCategories(report.relationLabels, report.respondersNumber)}
                 yCategories={report.answerLabels}
-                avgValuesOptions={this.getFormattedAvgValues(this.state.statistics[idx])}
+                avgValuesOptions={this.getFormattedAvgValues(this.props.statistics[idx])}
               />
             </div>
             </div>
@@ -112,6 +76,12 @@ class Report extends React.Component {
     );
   }
 }
+
+Report.propTypes = {
+  userId: React.PropTypes.string.isRequired,
+  reports: React.PropTypes.array.isRequired,
+  statistics: React.PropTypes.array.isRequired
+};
 
 export default Report;
 

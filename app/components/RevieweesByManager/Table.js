@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BaseTable } from './Table';
+import { BaseTable } from '../Grid/Table';
 import Row from './Row';
 
 export default class Table extends BaseTable {

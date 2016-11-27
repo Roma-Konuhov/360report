@@ -29,3 +29,24 @@ exports.revieweesGet = function(req, res) {
     res.json({ status: 'ok', data: result });
   });
 };
+
+exports.reportGet = function(req, res) {
+  return async.waterfall([
+    ManagerReport.getReport.bind(null, req.params.id),
+    ManagerReport.regroupBySeries
+  ], function(err, result) {
+    if (err) {
+      return res.status(400).json({status: 'fail', message: err});
+    }
+    res.json({ status: 'ok', data: result });
+  });
+};
+
+exports.statisticsGet = function(req, res) {
+  ManagerReport.getStatistics(req.params.id, function(err, result) {
+    if (err) {
+      return res.status(400).json({satus: 'fail', message: err});
+    }
+    res.json({status: 'ok', data: result})
+  });
+};

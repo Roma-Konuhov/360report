@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var mongoose = require('../db');
 var async = require('async');
 var consultantReportSchema = require('../db/schema').consultantReportSchema;
@@ -6,9 +7,8 @@ var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
 var questions = require('../config/data').consultantQuestions;
-var _ = require('lodash');
-var User = require('./User');
 var Relation = require('./Relation');
+var User = require('./User');
 var uniqueBy = require('../helpers/collection').uniqueBy;
 
 var CSV_TO_DB_MAP = {
@@ -39,12 +39,12 @@ consultantReportSchema.statics.dropCollection = function(cb) {
 
 consultantReportSchema.statics.mapAnswersTextToNum = function() {
   var lcAnswers = _.map(answers, function(answer) { return answer.toLowerCase() });
-  return _.zipObject(lcAnswers, _.range(5));
+  return _.zipObject(lcAnswers, _.range(lcAnswers.length));
 };
 
 consultantReportSchema.statics.mapAnswersNumToText = function() {
   var lcAnswers = _.map(answers, function(answer) { return answer.toLowerCase() });
-  return _.zipObject(_.range(5), lcAnswers);
+  return _.zipObject(_.range(lcAnswers.length), lcAnswers);
 };
 
 consultantReportSchema.statics.validate = function(data, cb) {
@@ -554,7 +554,6 @@ consultantReportSchema.statics.getAvgAnswersByCompany = function(cb) {
     cb(null, data);
   });
 };
-
 
 
 var ConsultantReport = mongoose.model('ConsultantReport', consultantReportSchema);

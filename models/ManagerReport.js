@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var mongoose = require('../db');
 var async = require('async');
 var managerReportSchema = require('../db/schema').managerReportSchema;
@@ -6,7 +7,7 @@ var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
 var questions = require('../config/data').managerQeustions;
-var _ = require('lodash');
+var Relation = require('./Relation');
 var User = require('./User');
 var uniqueBy = require('../helpers/collection').uniqueBy;
 
@@ -66,6 +67,7 @@ managerReportSchema.statics.parse = function(filename, cb) {
 };
 
 managerReportSchema.statics.castAnswers = function(data, cb) {
+  /* TODO: check possibility to replace ManagerReport with 'this' */
   var answersTextToNumMap = ManagerReport.mapAnswersTextToNum();
   var collection = [];
   var lcValue;
@@ -73,6 +75,7 @@ managerReportSchema.statics.castAnswers = function(data, cb) {
   data.forEach(function(row) {
     var result = {};
     for (var key in row) {
+      // convert questions(fields with name qN) to its integer representation
       if (key.search(/^q\d{1,2}$/) !== -1) {
         lcValue = row[key].toLowerCase();
         result[key] = answersTextToNumMap[lcValue];
@@ -97,9 +100,18 @@ managerReportSchema.statics.saveCollection = function(data, cb) {
 
     async.waterfall([
       function(cb) {
+        Relation.findOne({ reviewee: row.reviewee, responderEmail: row.responder }, function(err, instance) {
+          if (err) return cb(err, null);
+          if (instance) {
+            report.relation = instance.relation;
+          }
+          cb(null, report);
+        });
+      },
+      function(report, cb) {
         report.save(function(err, instance) {
+          logger.info('report', instance.toObject());
           if (err) return cb(err);
-          logger.info('push')
           reportCollection.push(instance);
           cb(null);
         });
@@ -111,7 +123,6 @@ managerReportSchema.statics.saveCollection = function(data, cb) {
         });
       },
       function(found, cb) {
-        logger.info('inside %d', found.length);
         if (!found.length) {
           userCollection.push({
             name: row.reviewee,
@@ -158,6 +169,8 @@ managerReportSchema.statics.saveCollection = function(data, cb) {
  * @returns {Promise}
  */
 managerReportSchema.statics.getReviewees = function(cb) {
+  logger.info('Request for list of all reviewees');
+
   return this.aggregate([
     { $group: { _id: "$reviewee", responders_number: { $sum: 1 } }},
     { $project: { username: "$_id", responders_number: "$responders_number" } }
@@ -166,11 +179,374 @@ managerReportSchema.statics.getReviewees = function(cb) {
       logger.error(err);
       return cb(err, null);
     }
-    logger.info('List of reviewees performed by managers was fetched successfully');
+    logger.info('List of reviewees performed by consultant was fetched successfully');
     cb(null, data);
   });
 };
 
+/**
+ * Returns report in format
+ * [
+ *  {
+ *    _.id: { relation: <int> },
+ *    num_of_responders: <int>,
+ *    responders: [<string>, <string>, ...],    // list of responders
+ *    answer1: [
+ *      {
+ *        answer: <int>,                        // answer per responder
+ *        responder: <string>
+ *      },
+ *      ...
+ *    ],
+ *    ...
+ *    q1: {
+ *      answer: <int>                           // summary answer per responders with the same role
+ *      text: <string>                          // question label
+ *    },
+ *    ...
+ *  }
+ * ...
+ * ]
+ *
+ * @param {Number} userId
+ * @param {Function} cb
+ */
+managerReportSchema.statics.getReport = function(userId, cb) {
+  logger.info('Request for report for reviewee with ID "%s"', userId);
+
+  var groupQuery = {
+    $group: {
+      _id: {relation: '$relation'},
+      num_of_responders: {$sum: 1},
+      responders: {$push: "$responder"}
+    }
+  };
+
+  for (var i = 1; i <= questions.length; i++) {
+    groupQuery['$group']['q' + i] = {$sum: '$q' + i};
+    groupQuery['$group']['answers' + i] = {$push: {answer: '$q' + i, responder: "$responder"}};
+  }
+
+  ManagerReport.aggregate([
+    {$lookup: {from:'users',localField:'reviewee',foreignField:'name',as:'joined_reviewee'}},
+    {$match:{'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
+    groupQuery,
+    {$sort: {'_id.relation': 1}}
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get answers grouped by responders roles was completed successfully');
+    cb(null, data);
+  });
+};
+
+/**
+ * Adds full text for question subfields. I.e. this method
+ * converts question subfield from
+ * { q1: 2 }
+ * to
+ * { q1: {question: <FullQuestionText>, value: 2 }}
+ *
+ * @param {Object} reports
+ * @param {Function} cb
+ */
+managerReportSchema.statics.addQuestionText = function(reports, cb) {
+  logger.info('Adds full text for question subfields, i.e. convert from { q1: 2 } to { q1: {question: FullQuestionText, value: 2 }}');
+
+  var ManagerQuestion = require('./ManagerQuestion');
+  ManagerQuestion.find({}, function(err, questions) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    reports.forEach(function(report) {
+      questions.forEach(function(question) {
+        var answer = report[question.q];
+        report[question.q] = {
+          text: question.text,
+          answer: answer
+        }
+      });
+    });
+    logger.info('Question\'s full text was added successfully');
+    cb(null, reports);
+  });
+};
+
+/**
+ * Adds additional field "relationStr" which contains text representation of the relation
+ *
+ * @param {Object} reports
+ * @param {Function} cb
+ */
+managerReportSchema.statics.addRelationStr = function(reports, cb) {
+  logger.info('Add field "relationStr" which contains text representations of the relation');
+
+  var relations = Relation.mapRelationsNumToText();
+
+  reports.forEach(function(report) {
+    report.relationStr = relations[report._id.relation];
+  });
+  logger.info('The field "relationStr" was added successfully');
+  cb(null, reports);
+};
+
+/**
+ * Input data is grouped by responders. This method regroups data by questions.
+ * Output:
+ * [
+ *  {
+ *    text: <question in text form>
+ *    [
+ *      relation: {
+   *      name: 'Line manager',
+   *      num_of_responders: 2,
+   *      sum_answer: 5,
+   *      answers: [{responder: 'auser@cogn.com', answer: 1}, {responder: 'buser@cogn.com', answer: 4}]
+   *
+   *    },
+ *    ...
+ *    ]
+ *  },
+ *  ...
+ * ]
+ *
+ * @param {Object} reports
+ * @param {Function} cb
+ */
+managerReportSchema.statics.regroupByQuestions = function(reports, cb) {
+};
+
+/**
+ * Input data is grouped by responders. This method regroups data by series.
+ * Output:
+ * [
+ *  {
+ *    text: <question in text form>
+ *    relationLabels: ['Self-evaluation', 'Manager', 'Line manager', 'Peer', 'Direct report'],
+ *    answerLabels: ['Don`t know', 'Strongly Disagree', 'Disagree', 'Agree', 'Strongly Agree'],
+ *    answers: [ 5, 1, 0, 3, 6 ],
+ *    avgAnswers: [2.5, 0.5, 0, 1.5, 3],
+ *    respondersNumber: [1, 3, 2, 5, 1]
+ *  },
+ *  ...
+ * ]
+ *
+ * @param {Object} reports
+ * @param {Function} cb
+ */
+managerReportSchema.statics.regroupBySeries = function(reports, cb) {
+  logger.info('Regrouping data by series');
+
+  var relationLabels = Object.values(Relation.mapRelationsNumToText());
+  var answerLabels = Object.values(ManagerReport.mapAnswersNumToText());
+  var ManagerQuestion = require('./ManagerQuestion');
+  var result = [];
+  var qObject = {};
+
+  ManagerQuestion.find({}, function(err, questions) {
+    questions.forEach(function(question) {
+      var sumAnswer = 0;
+      var avgAnswer = 0;
+      var orderIdx;
+      qObject = {
+        text: question.text,
+        relationLabels: relationLabels,
+        answerLabels: answerLabels,
+        answers: {},
+        avgAnswers: {},
+        respondersNumber: {}
+      };
+      reports.forEach(function(report) {
+        // skip reports of responders who doesn't have any relation with reviewee
+        if (report._id.relation !== -1) {
+          sumAnswer = report[question.q];
+          avgAnswer = parseFloat((sumAnswer / report.num_of_responders).toFixed(AVG_DECIMAL_PRECISION));
+          orderIdx = report._id.relation;
+          qObject['answers'][orderIdx] = sumAnswer;
+          qObject['avgAnswers'][orderIdx] = avgAnswer;
+          qObject['respondersNumber'][orderIdx] = report.num_of_responders;
+        } else {
+          logger.warn('Responders %j were skipped since they don\'t stand in any relation with reviewee', report.responders);
+        }
+      });
+      // fill answers for missed roles
+      for (var i = 0; i < relationLabels.length; i ++) {
+        if (_.isUndefined(qObject['answers'][i])) {
+          qObject['answers'][i] = qObject['avgAnswers'][i] = qObject['respondersNumber'][i] = 0;
+        }
+      }
+      qObject['answers'] = Object.values(qObject['answers']);
+      qObject['avgAnswers'] = Object.values(qObject['avgAnswers']);
+      qObject['respondersNumber'] = Object.values(qObject['respondersNumber']);
+      result.push(qObject);
+    });
+    logger.info('The regrouping by series is finished successfully');
+    cb(null, result);
+  });
+};
+
+/**
+ * Returns statistics for each question for a specific person
+ * [
+ *   {
+ *     self_score: <float>,
+ *     avg_score: <float>, // avg score without self assessment
+ *     avg_norm:  <float>, // avg score based on all answers
+ *     self_gap: <float>,  // self_score - avg_score
+ *     avg_gap: <float>    // avg_norm - avg_score
+ *   },
+ *   ...
+ * ]
+ *
+ * @param userId
+ * @param {Function} cb
+ */
+managerReportSchema.statics.getStatistics = function(userId, cb) {
+  logger.info('Get statistics for person with ID "%s"', userId);
+  async.parallel({
+    selfAvg:  this.getAvgAnswersForReviewee.bind(this, userId),
+    respondersAvg: this.getAvgAnswersByResponders.bind(this, userId),
+    companyAvg: this.getAvgAnswersByCompany
+  }, function(err, results) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Statistics for a person "%s" was gathered successfully', userId);
+
+    var data = [], selfScore, avgScore, avgNorm;
+    for (var i = 1; i <= questions.length; i++) {
+      selfScore = results.selfAvg.length ? results.selfAvg[0]['q' + i] : 0;
+      avgScore = results.respondersAvg.length ? results.respondersAvg[0]['avg_score' + i] : 0;
+      avgNorm = results.companyAvg.length ? results.companyAvg[0]['avg_norm' + i] : 0;
+
+      selfScore = selfScore.toFixed(AVG_DECIMAL_PRECISION);
+      avgScore = avgScore.toFixed(AVG_DECIMAL_PRECISION);
+      avgNorm = avgNorm.toFixed(AVG_DECIMAL_PRECISION);
+
+      data.push({
+        self_score: selfScore,
+        avg_score: avgScore,
+        avg_norm: avgNorm,
+        self_gap: (selfScore - avgScore).toFixed(AVG_DECIMAL_PRECISION),
+        avg_gap: (avgNorm - avgScore).toFixed(AVG_DECIMAL_PRECISION)
+      });
+    }
+    cb(null, data);
+  });
+};
+
+/**
+ * Returns average answers of all responders for a specific person, excluding himself
+ * [
+ *   { _id: 1,
+ *     avg_score1: <float>,
+ *     avg_score1: <float>,
+ *     ...
+ *   },
+ *   ...
+ * ]
+ *
+ * @param userId
+ * @param {Function} cb
+ */
+managerReportSchema.statics.getAvgAnswersByResponders = function(userId, cb) {
+  logger.info('Aggregated query to get average answers of all responders for for a person with ID "%s", excluding reviewee', userId);
+
+  var groupQuery = {
+    $group: { _id: null }
+  };
+
+  for (var i = 1; i <= questions.length; i++) {
+    groupQuery['$group']['avg_score' + i] = {$avg: '$q' + i};
+  }
+
+  ManagerReport.aggregate([
+    {$lookup: {from: 'users', localField: 'reviewee', foreignField: 'name', as: 'joined_reviewee'}},
+    {$match: {'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
+    {'$unwind': '$joined_reviewee'},
+    {$redact: {$cond: [{$ne:['$responder','$joined_reviewee.email']},'$$KEEP','$$PRUNE']}},
+    groupQuery
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get average answers of all responders for a person, excluding reviewee, was completed successfully');
+    cb(null, data);
+  });
+};
+
+/**
+ * Returns average answers for a specific person
+ * [
+ *   { _id: 1,
+ *     self_score1: <float>,
+ *     self_score1: <float>,
+ *     ...
+ *   },
+ *   ...
+ * ]
+ *
+ * @param userId
+ * @param {Function} cb
+ */
+managerReportSchema.statics.getAvgAnswersForReviewee = function(userId, cb) {
+  logger.info('Aggregated query to get average answers for a person with ID "%s", excluding himself', userId);
+
+  ManagerReport.aggregate([
+    {$lookup: {from: 'users', localField: 'reviewee', foreignField: 'name', as: 'joined_reviewee'}},
+    {$match: {'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
+    {'$unwind': '$joined_reviewee'},
+    {$redact: {$cond: [{$eq:['$responder','$joined_reviewee.email']},'$$KEEP','$$PRUNE']}}
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get average answers for a person, excluding himself, was completed successfully');
+    cb(null, data);
+  });
+};
+
+/**
+ * Returns average answers of all people in the company
+ * [
+ *   { _id: 1,
+ *     avg_norm2: <float>,
+ *     avg_norm2: <float>,
+ *     ...
+ *   },
+ *   ...
+ * ]
+ *
+ * @param {Function} cb
+ */
+managerReportSchema.statics.getAvgAnswersByCompany = function(cb) {
+  logger.info('Aggregated query to get average answers of all people in the company');
+
+  var groupQuery = {
+    $group: { _id: null }
+  };
+
+  for (var i = 1; i <= questions.length; i++) {
+    groupQuery['$group']['avg_norm' + i] = {$avg: '$q' + i};
+  }
+
+  ManagerReport.aggregate([
+    groupQuery
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get average answers of all people in the company was completed successfully');
+    cb(null, data);
+  });
+};
 
 var ManagerReport = mongoose.model('ManagerReport', managerReportSchema);
 

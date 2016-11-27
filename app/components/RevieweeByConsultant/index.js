@@ -24,10 +24,6 @@ class RevieweesByConsultant extends Component {
     this.setState({ data: nextProps.revieweesByConsultants });
   }
 
-  onRowClick(row, e) {
-    console.log(row, e)
-  }
-
   render() {
     return (
       <div className="container">

@@ -3,12 +3,9 @@ import { BaseRow } from '../Grid/Row';
 import Cell from '../Grid/Cell';
 
 class Row extends BaseRow {
-  constructor(props) {
-    super(props);
-  }
-
   onRowClick(row, e) {
-    var pathname = '/report/' + row.id;
+    console.log(row.id)
+    var pathname = '/consultant/report/' + row.id;
     this.context.router.push({ pathname: pathname });
   }
 

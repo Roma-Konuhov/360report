@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Table from '../Grid/Table';
+import Table from './Table';
 
 class RevieweesByManager extends Component {
   constructor(props) {
@@ -24,10 +24,6 @@ class RevieweesByManager extends Component {
     this.setState({ data: nextProps.revieweesByManagers });
   }
 
-  onRowClick(row, idx, e) {
-    console.log(row, idx, e)
-  }
-
   render() {
     return (
       <div className="container">
@@ -35,7 +31,7 @@ class RevieweesByManager extends Component {
           data={this.state.data}
           columns={this.columns}
           propsDbToScreenMap={this.propsDbToScreenMap}
-          hoverable="true"
+          hoverable
         />
       </div>
     );
