@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import { fetch } from '../helpers/ajax';
 
 class App extends React.Component {
   constructor(props) {
@@ -18,32 +19,8 @@ class App extends React.Component {
     this.loadPeopleRelations();
   }
 
-  fetch(url) {
-    return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true);
-      xhr.onload = xhr.onerror = function() {
-        try {
-          var result = JSON.parse(xhr.response);
-        } catch(e) {
-          return reject();
-        }
-        if (this.status == 200) {
-          if (result.status === 'ok') {
-            return resolve(result.data);
-          } else {
-            return reject(result.message);
-          }
-        } else {
-          return reject(result.message);
-        }
-      };
-      xhr.send();
-    });
-  }
-
   loadRevieweesByConsultants() {
-    return this.fetch('/reviewees-by-consultants').then(data => {
+    return fetch('/reviewees-by-consultants').then(data => {
       this.setState({ revieweesByConsultants: data });
     }, reason => {
       //console.log(reason);
@@ -51,7 +28,7 @@ class App extends React.Component {
   }
 
   loadRevieweesByManagers() {
-    return this.fetch('/reviewees-by-managers').then(data => {
+    return fetch('/reviewees-by-managers').then(data => {
       this.setState({ revieweesByManagers: data });
     }, reason => {
       //console.log(reason);
@@ -59,7 +36,7 @@ class App extends React.Component {
   }
 
   loadPeopleRelations() {
-    return this.fetch('/people-relations').then(data => {
+    return fetch('/people-relations').then(data => {
       this.setState({ peopleRelations: data });
     }, reason => {
       //console.log(reason);

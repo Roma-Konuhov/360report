@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+var http = require('http');
 var requestLogger = require('morgan');
 var logger = require('./lib/logger')(module);
 var compression = require('compression');
@@ -17,6 +18,9 @@ var less = require('less-middleware');
 var webpack = require('webpack');
 var webpackConfig = require('./webpack.config');
 var config = require('./config');
+var sendHttpError = require('./middleware/sendHttpError');
+var HttpError = require('./lib/error').HttpError;
+var errorHandler = require('errorhandler');
 
 // Is used to check DB connection on bootstrap stage
 require('./db');
@@ -86,16 +90,33 @@ app.use(function(req, res) {
   });
 });
 
-// Production error handler
-if (app.get('env') === 'production') {
-  app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    res.sendStatus(err.status || 500);
-  });
-  app.use(requestLogger('default'));
-}
 if (app.get('env') === 'development') {
   app.use(requestLogger('dev'));
+}
+
+// Error handler
+app.use(function(err, req, res, next) {
+  if (typeof err == 'number') {
+    err = new HttpError(err);
+  }
+
+  if (err instanceof HttpError) {
+    sendHttpError(res, err);
+  } else {
+    if ('development' === app.get('env')) {
+      errorHandler()(err, req, res, next);
+    } else {
+      logger.error(err);
+      err = new HttpError(500);
+      sendHttpError(res, err);
+    }
+  }
+});
+
+if ('development' === app.get('env')) {
+  process.on('uncaughtException', (err) => {
+    logger.error(err);
+  });
 }
 
 app.listen(config.get('port'), function() {

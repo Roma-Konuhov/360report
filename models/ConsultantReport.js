@@ -422,8 +422,6 @@ consultantReportSchema.statics.getStatistics = function(userId, cb) {
       logger.error(err);
       return cb(err, null);
     }
-    logger.info('Statistics for a person "%s" was gathered successfully', userId);
-
     var data = [], selfScore, avgScore, avgNorm;
     for (var i = 1; i <= questions.length; i++) {
       selfScore = results.selfAvg.length ? results.selfAvg[0]['q' + i] : 0;
@@ -442,6 +440,7 @@ consultantReportSchema.statics.getStatistics = function(userId, cb) {
         avg_gap: (avgNorm - avgScore).toFixed(AVG_DECIMAL_PRECISION)
       });
     }
+    logger.info('Statistics for a person "%s" was gathered successfully', userId);
     cb(null, data);
   });
 };

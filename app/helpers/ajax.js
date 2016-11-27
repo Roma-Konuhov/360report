@@ -9,13 +9,9 @@ function fetch(url) {
         return reject();
       }
       if (this.status == 200) {
-        if (result.status === 'ok') {
-          return resolve(result.data);
-        } else {
-          return reject(result.message);
-        }
+        return resolve(result);
       } else {
-        return reject(result.message);
+        return reject(result);
       }
     };
     xhr.send();

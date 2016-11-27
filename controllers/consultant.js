@@ -1,10 +1,11 @@
 var logger = require('../lib/logger')(module);
+var HttpError = require('../lib/error').HttpError;
 var async = require('async');
 var ConsultantReport = require('../models/ConsultantReport');
 var User = require('../models/User');
 var _ = require('lodash');
 
-exports.revieweesGet = function(req, res) {
+exports.revieweesGet = function(req, res, next) {
 
   return async.waterfall([
     function(cb) {
@@ -25,13 +26,13 @@ exports.revieweesGet = function(req, res) {
     }
     ], function(err, result) {
       if (err) {
-        return res.status(400).json({status: 'fail', message: err});
+        return next(new HttpError(400, err.message));
       }
-      res.json({ status: 'ok', data: result });
+      res.json(result);
   });
 };
 
-exports.reportGet = function(req, res) {
+exports.reportGet = function(req, res, next) {
   return async.waterfall([
     ConsultantReport.getReport.bind(null, req.params.id),
     //ConsultantReport.addQuestionText,
@@ -39,17 +40,17 @@ exports.reportGet = function(req, res) {
     ConsultantReport.regroupBySeries
   ], function(err, result) {
     if (err) {
-      return res.status(400).json({status: 'fail', message: err});
+      return next(new HttpError(400, err.message));
     }
-    res.json({ status: 'ok', data: result });
+    res.json(result);
   });
 };
 
-exports.statisticsGet = function(req, res) {
+exports.statisticsGet = function(req, res, next) {
   ConsultantReport.getStatistics(req.params.id, function(err, result) {
     if (err) {
-      return res.status(400).json({satus: 'fail', message: err});
+      return next(new HttpError(400, err.message));
     }
-    res.json({status: 'ok', data: result})
+    res.json(result)
   });
 };

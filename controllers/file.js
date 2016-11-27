@@ -1,4 +1,5 @@
 var config = require('../config');
+var HttpError = require('../lib/error').HttpError;
 var async = require('async');
 var logger = require('../lib/logger')(module);
 var _ = require('lodash');
@@ -49,7 +50,7 @@ exports.upload = function(req, res, next) {
       async.waterfall(callStack, function(err, result) {
         if (err) {
           logger.error(err);
-          return res.status(500).json({ status: 'fail', error: err });
+          return next(new HttpError(400, err.message));
         }
         if (result) {
           logger.info("%d records were saved in the database", result.length);
@@ -58,5 +59,5 @@ exports.upload = function(req, res, next) {
     }
   }
 
-  res.json({status: 'ok'});
+  res.status(204).json({});
 };

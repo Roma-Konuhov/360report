@@ -1,4 +1,5 @@
 var logger = require('../lib/logger')(module);
+var HttpError = require('../lib/error').HttpError;
 var async = require('async');
 var ManagerReport = require('../models/ManagerReport');
 var User = require('../models/User');
@@ -24,9 +25,9 @@ exports.revieweesGet = function(req, res) {
     }
   ], function(err, result) {
     if (err) {
-      return res.status(400).json({status: 'fail', message: err});
+      return next(new HttpError(400, err.message));
     }
-    res.json({ status: 'ok', data: result });
+    res.json(result);
   });
 };
 
@@ -36,17 +37,17 @@ exports.reportGet = function(req, res) {
     ManagerReport.regroupBySeries
   ], function(err, result) {
     if (err) {
-      return res.status(400).json({status: 'fail', message: err});
+      return next(new HttpError(400, err.message));
     }
-    res.json({ status: 'ok', data: result });
+    res.json(result);
   });
 };
 
 exports.statisticsGet = function(req, res) {
   ManagerReport.getStatistics(req.params.id, function(err, result) {
     if (err) {
-      return res.status(400).json({satus: 'fail', message: err});
+      return next(new HttpError(400, err.message));
     }
-    res.json({status: 'ok', data: result})
+    res.json(result)
   });
 };

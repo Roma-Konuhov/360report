@@ -1,4 +1,5 @@
 var logger = require('../lib/logger')(module);
+var HttpError = require('../lib/error').HttpError;
 var Relation = require('../models/Relation');
 var relations = require('../config/data').relations;
 
@@ -17,9 +18,9 @@ exports.revieweesGet = function(req, res) {
   return Relation.find({}, function(err, data) {
     if (err) {
       logger.error(err);
-      return res.status(400).json({ status: 'fail', message: err });
+      return next(new HttpError(400, err.message));
     }
     logger.info('List of people relations was fetched successfully');
-    res.json({ status: 'ok', data: mapRelationDbToScreen(data) });
+    res.json(mapRelationDbToScreen(data));
   });
 };

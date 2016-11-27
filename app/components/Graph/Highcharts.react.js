@@ -29,7 +29,7 @@ export default React.createClass({
       //options.yAxis.categories = this.props.yCategories;
       options.yAxis.max = this.props.yCategories.length - 1;
       options.yAxis.labels.formatter = function() {
-        return this.value && `${self.props.yCategories[this.value]}<br>(${this.value})` || this.value;
+        return this.value && `${self.props.yCategories[this.value]}<br>(${this.value})` || '';
       };
     }
     if (!_.isEmpty(this.props.avgValuesOptions)) {

@@ -406,7 +406,6 @@ module.exports = {
    * @param {Function} cb
    */
   getStatistics: function(userId, cb) {
-    var self = this;
     logger.info('Get statistics for person with ID "%s"', userId);
     async.parallel({
       selfAvg: this.getAvgAnswersForReviewee.bind(this, userId),
@@ -417,10 +416,8 @@ module.exports = {
         logger.error(err);
         return cb(err, null);
       }
-      logger.info('Statistics for a person "%s" was gathered successfully', userId);
-
       var data = [], selfScore, avgScore, avgNorm;
-      for (var i = 1; i <= self.questions.length; i++) {
+      for (var i = 1; i <= this.questions.length; i++) {
         selfScore = results.selfAvg.length ? results.selfAvg[0]['q' + i] : 0;
         avgScore = results.respondersAvg.length ? results.respondersAvg[0]['avg_score' + i] : 0;
         avgNorm = results.companyAvg.length ? results.companyAvg[0]['avg_norm' + i] : 0;
@@ -437,7 +434,8 @@ module.exports = {
           avg_gap: (avgNorm - avgScore).toFixed(AVG_DECIMAL_PRECISION)
         });
       }
-      cb(null, data);
+      logger.info('Statistics for a person "%s" was gathered successfully', userId);
+      cb(data);
     });
   },
 
