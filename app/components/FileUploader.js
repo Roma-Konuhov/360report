@@ -28,19 +28,11 @@ class FileUploader extends React.Component {
 
       xhr.open("POST", "/upload", true);
       xhr.onload = xhr.onerror = function() {
-        try {
-          var result = JSON.parse(xhr.response);
-        } catch(e) {
-          return reject();
-        }
+        var result = xhr.response;
         if (this.status == 200) {
-          if (result.status === 'ok') {
-            return resolve(result.data);
-          } else {
-            return reject(result.message);
-          }
+          return resolve(result);
         } else {
-          return reject(result.message);
+          return reject(result);
         }
       };
       xhr.send(formData);
@@ -49,7 +41,6 @@ class FileUploader extends React.Component {
 
   componentDidMount() {
     // reinitializing of bootstrap filestyle plugin
-    console.log('FileUploader:componentDidMount ')
     $(':file').filestyle();
   }
 
@@ -66,8 +57,9 @@ class FileUploader extends React.Component {
           this.setState({ loaded: false });
         }, 4000);
       })
-      .catch(() => {
+      .catch(reason => {
         target.value = '';
+        console.log(reason);
         self.setState({ error: true, loading: false,  filename: 'No file' });
       });
   }

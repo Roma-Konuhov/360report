@@ -9,7 +9,8 @@ class App extends React.Component {
     this.state = {
       revieweesByConsultants: [],
       revieweesByManagers: [],
-      peopleRelations: []
+      peopleRelations: [],
+      error: {}
     };
   }
 
@@ -23,7 +24,10 @@ class App extends React.Component {
     return fetch('/reviewees-by-consultants').then(data => {
       this.setState({ revieweesByConsultants: data });
     }, reason => {
-      //console.log(reason);
+      this.setState({ error: reason });
+      setTimeout(function() {
+        this.setState({ error: {} });
+      }, 5000);
     });
   }
 
@@ -31,7 +35,10 @@ class App extends React.Component {
     return fetch('/reviewees-by-managers').then(data => {
       this.setState({ revieweesByManagers: data });
     }, reason => {
-      //console.log(reason);
+      this.setState({ error: reason });
+      setTimeout(function() {
+        this.setState({ error: {} });
+      }, 5000);
     });
   }
 
@@ -39,7 +46,10 @@ class App extends React.Component {
     return fetch('/people-relations').then(data => {
       this.setState({ peopleRelations: data });
     }, reason => {
-      //console.log(reason);
+      this.setState({ error: reason });
+      setTimeout(function() {
+        this.setState({ error: {} });
+      }, 5000);
     });
   }
 

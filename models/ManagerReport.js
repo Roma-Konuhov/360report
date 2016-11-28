@@ -3,14 +3,17 @@ var mongoose = require('../db');
 var async = require('async');
 var managerReportSchema = require('../db/schema').managerReportSchema;
 var CsvParser = require('./CsvParser');
-var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
 var questions = require('../config/data').managerQeustions;
 var Relation = require('./Relation');
 var User = require('./User');
 var uniqueBy = require('../helpers/collection').uniqueBy;
+var validator = require('../lib/validator');
+var validRule = require('joi');
 
+var AVG_DECIMAL_PRECISION = 2;
+var collectionName = 'manager_reports';
 
 var CSV_TO_DB_MAP = {
   'Timestamp': 'timestamp',
@@ -19,17 +22,19 @@ var CSV_TO_DB_MAP = {
   'Share my name': 'allow_to_share'
 };
 
-var AVG_DECIMAL_PRECISION = 2;
-
 questions.forEach(function(question, idx) {
   CSV_TO_DB_MAP[question] = 'q' + (1 + idx);
 });
 
-var validationSchema = {
-
+var validationRules = {
+  'timestamp': validRule.date(),
+  'responder': validRule.string().email().required(),
+  'reviewee': validRule.string().required(),
+  'allow_to_share': validRule.string().required(),
 };
-
-var collectionName = 'manager_reports';
+questions.forEach(function(question, idx) {
+  validationRules['q' + (1 + idx)] = validRule.string().required();
+});
 
 managerReportSchema.statics.dropCollection = function(cb) {
   mongoose.connection.db.dropCollection(collectionName, function() {
@@ -49,7 +54,7 @@ managerReportSchema.statics.mapAnswersNumToText = function() {
 };
 
 managerReportSchema.statics.validate = function(data, cb) {
-  cb(null, data);
+  validator.validate(data, validationRules, cb);
 };
 
 managerReportSchema.statics.parse = function(filename, cb) {
@@ -60,8 +65,9 @@ managerReportSchema.statics.parse = function(filename, cb) {
   CsvParser.parse(filename, function(err, data) {
     if (err) {
       logger.error(err);
+    } else {
+      logger.info('Data from file "%s" was parsed: %j', filename, data);
     }
-    logger.info('Data from file "%s" was parsed: %j', filename, data);
     cb(err, data);
   });
 };

@@ -47,21 +47,24 @@ exports.upload = function(req, res, next) {
         ];
       }
       async.waterfall(callStack, function(err, result) {
+        if (config.get('upload:removeAfterProcessing')) {
+          fs.unlink(filepath, function(err) {
+            if (err) {
+              logger.warn('During removing of the CSV file "%s" the error is occurred: %s', filepath, err);
+            } else {
+              logger.info('CSV file "%s" was removed', filepath);
+            }
+          });
+        }
         if (err) {
           logger.error(err);
-          return next(new HttpError(400, err.message));
+          return next(new HttpError(400, err));
         }
         if (result) {
           logger.info("%d records were saved in the database", result.length);
-          if (config.get('upload:removeAfterProcessing')) {
-            fs.unlink(filepath, function(err) {
-              logger.info('CSV file "%s" was removed', filepath);
-            });
-          }
+          res.status(200).json({status: 'ok'});
         }
       });
     }
   }
-
-  res.status(204).json({});
 };

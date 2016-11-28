@@ -1,4 +1,5 @@
 exports.consultantQuestions = [
+  'Works toward a common goal first',
   'Is always ready to help others',
   'Willingly shares useful knowledge',
   'Expresses opinion openly and honestly',

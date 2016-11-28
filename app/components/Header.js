@@ -10,6 +10,9 @@ class Header extends React.Component {
     return (
       <nav className="navbar navbar-default navbar-static-top">
         <div className="container">
+          <Display if={this.props.error} nowrap="true">
+            <Error error={this.props.error} />
+          </Display>
           <div id="navbar" className="navbar-collapse collapse">
             <IndexLink to="/" className="logo"></IndexLink>
             <ul className="nav navbar-nav">

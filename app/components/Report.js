@@ -2,6 +2,7 @@ import React from 'react';
 import Chart from './Graph/Highcharts.react';
 import InfoBlock from './InfoBlock';
 import UserData from './UserData';
+//import PersonalStatistics from './Statistics/Personal';
 import Statistics from './Statistics';
 
 class Report extends React.Component {

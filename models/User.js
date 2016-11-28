@@ -18,8 +18,8 @@ userSchema.methods.comparePassword = function(password, cb) {
 userSchema.statics.generateEmailByFullname = function(fullname) {
   var trimRegexp = /^[\s\W]+|[\s\W]+$/g;
   var fullnameParts = fullname.replace(trimRegexp, '').split(/\s+/);
-  var firstName = fullnameParts[0].toLowerCase();
-  var lastName = fullnameParts[1].toLowerCase();
+  var firstName = fullnameParts[0] && fullnameParts[0].toLowerCase();
+  var lastName = fullnameParts[1] && fullnameParts[1].toLowerCase();
 
   return firstName.charAt(0) + lastName + '@' + EMAIL_DOMAIN;
 };
