@@ -1,26 +1,25 @@
 import React from 'react';
 import Table from './Table';
 
-class Statistics extends React.Component {
+class PersonalStatistics extends React.Component {
   constructor(props) {
     super(props);
 
     this.propsDbToScreenMap = {
-      'text': 'Indicator',
       'self_score': 'Self score',
       'avg_score': 'Avg score',
       'avg_norm': 'Avg norm',
       'self_gap': 'Self gap',
       'avg_gap': 'Avg gap'
     };
-    this.columns = ['text', 'self_score', 'avg_score', 'avg_norm', 'self_gap', 'avg_gap'];
+    this.columns = ['self_score', 'avg_score', 'avg_norm', 'self_gap', 'avg_gap'];
   }
 
   render() {
     return (
-      <div className="statistics">
+      <div className="personal-statistics">
         <Table
-          data={this.props.data}
+          data={[this.props.data]}
           columns={this.columns}
           propsDbToScreenMap={this.propsDbToScreenMap}
         />
@@ -29,8 +28,8 @@ class Statistics extends React.Component {
   }
 }
 
-Statistics.defaultProps = {
-  data: []
+PersonalStatistics.defaultProps = {
+  data: {}
 };
 
-export default Statistics;
+export default PersonalStatistics;

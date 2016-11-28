@@ -206,7 +206,7 @@ h2 {
   padding-right: 20px;
 
   .data-table {
-    tr, td {
+    th, td {
       text-align: center;
     }
     tr:first-child, td:first-child {
@@ -277,7 +277,7 @@ h2 {
   width: 50%;
 }
 
-.statistics {
+.personal-statistics {
   width: 470px;
   position: absolute;
   z-index: 10;
@@ -302,6 +302,35 @@ h2 {
         &.negative {
           color: #f00;
         }
+      }
+    }
+  }
+}
+
+.statistics {
+  .data-table {
+    th, td {
+      text-align: center;
+    }
+    th {
+      background: #000;
+      color: #ddd;
+    }
+    tr:first-child, td:first-child {
+      text-align: left;
+    }
+    thead tr,
+    tbody tr {
+      font-weight: bold;
+      border-top: 3px solid #000;
+      border-bottom: 3px solid #000;
+    }
+    tbody tr {
+      &:nth-child(2n + 1) {
+        background: #e7e7e7;
+      }
+      &:hover {
+        cursor: default;
       }
     }
   }
