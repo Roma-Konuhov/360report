@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var mongoose = require('../db');
 var relationSchema = require('../db/schema').relationSchema;
 var CsvParser = require('./CsvParser');
@@ -5,7 +6,8 @@ var User = require('./User');
 var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var relations = require('../config/data').relations;
-var _ = require('lodash');
+var validator = require('../lib/validator');
+var validRule = require('joi');
 
 var CSV_TO_DB_MAP = {
   'responder': 'responder',
@@ -13,8 +15,10 @@ var CSV_TO_DB_MAP = {
   'relation': 'relation',
 };
 
-var validationSchema = {
-
+var validationRules = {
+  'responder': validRule.string().required(),
+  'reviewee': validRule.string().required(),
+  'relation': validRule.string().required(),
 };
 
 var collectionName = 'relations';
@@ -27,7 +31,7 @@ relationSchema.statics.dropCollection = function(cb) {
 };
 
 relationSchema.statics.validate = function(data, cb) {
-  cb(null, data);
+  validator.validate(data, validationRules, cb);
 };
 
 relationSchema.statics.mapRelationsTextToNum = function() {

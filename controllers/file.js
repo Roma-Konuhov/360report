@@ -23,7 +23,7 @@ exports.upload = function(req, res, next) {
       if (!FILETYPE_TO_MODEL_MAP[fileType]) {
         var message = 'The name of the field for uploaded file is not supported';
         logger.warn(message);
-        return res.status(405).json({ status: 'fail', error: message });
+        return next(new HttpError(405, message));
       }
 
       var Model = FILETYPE_TO_MODEL_MAP[fileType];
