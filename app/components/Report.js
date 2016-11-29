@@ -1,6 +1,8 @@
 import React from 'react';
 import Chart from './Graph/Highcharts.react';
-import InfoBlock from './InfoBlock';
+import InfoBlock from './Text/InfoBlock';
+import TextBlockBeforeStat from './Text/TextBlockBeforeStat';
+import TextBlockAfterStat from './Text/TextBlockAfterStat';
 import UserData from './UserData';
 import PersonalStatistics from './Statistics/Personal';
 import Statistics from './Statistics';
@@ -63,14 +65,6 @@ class Report extends React.Component {
     return resultArray;
   }
 
-  renderTextBeforeStatistics() {
-    return <p>This section identifies your highest and lowest scores. The Gaps indicate the poscoresitive or negative differences between your self-evaluation score and average score of others, average score of others and company norm (average).</p>;
-  }
-
-  renderTextAfterStatistics() {
-    return <p>Comments compiled in this section are recorded exactly as entered by the respondents - they are not edited, emphasized, ordered or filtered in any way. Where comments appear to be duplicated it is where the same comment has been entered by more than one respondent.</p>;
-  }
-
   render() {
     return (
       <div className="container">
@@ -94,9 +88,9 @@ class Report extends React.Component {
             </div>
           )
         })}
-        {this.renderTextBeforeStatistics()}
+        <TextBlockBeforeStat />
         <Statistics data={this.addDataByField(this.props.statistics, this.props.reports, 'text')} />
-        {this.renderTextAfterStatistics()}
+        <TextBlockAfterStat />
       </div>
     );
   }
