@@ -30,7 +30,7 @@ var validationRules = {
   'timestamp': validRule.date(),
   'responder': validRule.string().email().required(),
   'reviewee': validRule.string().required(),
-  'allow_to_share': validRule.string().required(),
+  'allow_to_share': validRule.string(),
 };
 questions.forEach(function(question, idx) {
   validationRules['q' + (1 + idx)] = validRule.string().required();

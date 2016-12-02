@@ -3,7 +3,6 @@ var mongoose = require('../db');
 var relationSchema = require('../db/schema').relationSchema;
 var CsvParser = require('./CsvParser');
 var User = require('./User');
-var validator = require('validator');
 var logger = require('../lib/logger')(module);
 var relations = require('../config/data').relations;
 var validator = require('../lib/validator');

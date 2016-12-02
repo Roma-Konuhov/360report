@@ -59,9 +59,9 @@ consultantReportSchema.statics.validate = function(data, cb) {
 
 consultantReportSchema.statics.parse = function(filename, cb) {
   CsvParser.setCsvToDbMap(CSV_TO_DB_MAP);
-  // CsvParser.setFilter(function(row) {
-  //   return row.responder && row.reviewee;
-  // });
+  CsvParser.setFilter(function(row) {
+    return row.responder && row.reviewee;
+  });
   CsvParser.parse(filename, function(err, data) {
     if (err) {
       logger.error(err);

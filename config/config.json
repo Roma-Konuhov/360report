@@ -34,7 +34,8 @@
     "fields": [
       "consultant_report",
       "manager_report",
-      "people_relations"
+      "people_relations",
+      "users"
     ]
   }
 }

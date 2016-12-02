@@ -66,7 +66,7 @@ class FileUploader extends React.Component {
 
   render() {
     return (
-      <div className="file-uploader col-sm-4">
+      <div className="file-uploader col-sm-3">
         <form action={this.props.url} encType="multipart/form-data" method="post">
           <label>{this.props.label}</label>
           <Display if={this.state.loaded} inline="true">

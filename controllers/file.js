@@ -7,12 +7,54 @@ var logger = require('../lib/logger')(module);
 var ConsultantReport = require('../models/ConsultantReport');
 var ManagerReport = require('../models/ManagerReport');
 var Relation = require('../models/Relation');
+var User = require('../models/User');
 
 var FILETYPE_TO_MODEL_MAP = _.zipObject(config.get('upload:fields'), [
   ConsultantReport,
   ManagerReport,
-  Relation
+  Relation,
+  User
 ]);
+
+/**
+ * Returns call stack for specified file type
+ *
+ * @param {String} fileType
+ * @returns {Array}
+ */
+const getCallStackFor = function(fileType, filepath) {
+  var Model = FILETYPE_TO_MODEL_MAP[fileType];
+
+  switch (fileType) {
+    case 'users':
+      return [
+        Model.dropCollection,
+        Model.parse.bind(Model, filepath),
+        Model.validate,
+        Model.saveCollection
+      ];
+    case 'people_relations':
+      return [
+        Model.dropCollection,
+        Model.parse.bind(Model, filepath),
+        Model.validate,
+        Model.castRelations,
+        Model.addEmailFields,
+        Model.saveCollection
+      ];
+    case 'consultant_report':
+    case 'manager_report':
+      return [
+        Model.dropCollection,
+        Model.parse.bind(Model, filepath),
+        Model.validate,
+        Model.castAnswers,
+        Model.saveCollection
+      ];
+    default:
+      return [];
+  }
+};
 
 exports.upload = function(req, res, next) {
   for (var fileType in FILETYPE_TO_MODEL_MAP) {
@@ -26,26 +68,8 @@ exports.upload = function(req, res, next) {
         return next(new HttpError(405, message));
       }
 
-      var Model = FILETYPE_TO_MODEL_MAP[fileType];
+      var callStack = getCallStackFor(fileType, filepath);
 
-      if (fileType === 'people_relations') {
-        var callStack = [
-          Model.dropCollection,
-          Model.parse.bind(Model, filepath),
-          Model.validate,
-          Model.castRelations,
-          Model.addEmailFields,
-          Model.saveCollection
-        ];
-      } else {
-        var callStack = [
-          Model.dropCollection,
-          Model.parse.bind(Model, filepath),
-          Model.validate,
-          Model.castAnswers,
-          Model.saveCollection
-        ];
-      }
       async.waterfall(callStack, function(err, result) {
         if (config.get('upload:removeAfterProcessing')) {
           fs.unlink(filepath, function(err) {
