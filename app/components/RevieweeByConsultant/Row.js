@@ -1,12 +1,13 @@
 import React from 'react';
 import { BaseRow } from '../Grid/Row';
 import Cell from '../Grid/Cell';
+import { hashHistory } from 'react-router';
 
 class Row extends BaseRow {
   onRowClick(row, e) {
     console.log(row.id)
     var pathname = '/consultant/report/' + row.id;
-    this.context.router.push({ pathname: pathname });
+    hashHistory.push(pathname);
   }
 
   render() {
@@ -19,10 +20,6 @@ class Row extends BaseRow {
     );
   }
 }
-
-Row.contextTypes = {
-  router: React.PropTypes.object.isRequired
-};
 
 
 export default Row;
