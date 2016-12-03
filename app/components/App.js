@@ -35,7 +35,6 @@ class App extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log('inner state', state)
   return {
     revieweesByConsultants: state.entities.revieweesByConsultants,
     revieweesByManagers: state.entities.revieweesByManagers,

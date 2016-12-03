@@ -59,7 +59,8 @@ const getCallStackFor = function(fileType, filepath) {
 exports.upload = function(req, res, next) {
   for (var fileType in FILETYPE_TO_MODEL_MAP) {
     if (req.files[fileType] && req.files[fileType][0]) {
-      logger.info('File ' + req.files[fileType][0].originalname + ' was uploaded');
+      var filename = req.files[fileType][0].originalname;
+      logger.info('File "%s" was uploaded', filename);
       var filepath = req.files[fileType][0].path;
 
       if (!FILETYPE_TO_MODEL_MAP[fileType]) {
@@ -86,7 +87,7 @@ exports.upload = function(req, res, next) {
         }
         if (result) {
           logger.info("%d records were saved in the database", result.length);
-          res.status(200).json({status: 'ok'});
+          res.status(200).json({message: `data from file ${filename} were stored successfully`});
         }
       });
     }

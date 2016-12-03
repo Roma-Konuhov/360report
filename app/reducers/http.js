@@ -10,7 +10,7 @@ export default function http(state = initialState, action) {
       });
     case 'RECEIVE_REQUEST':
       return Object.assign({}, state.requestCounter, {
-        requestCounter: state.requestCounter - 1
+        requestCounter: Math.max(0, state.requestCounter - 1)
       });
     default:
       return state;

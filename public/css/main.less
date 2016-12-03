@@ -128,9 +128,9 @@ h2 {
 }
 
 /* make keyframes that tell the start state and the end state of our object */
-@-webkit-keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
-@-moz-keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
-@keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+@-webkit-keyframes fadeOut { from { opacity:1;visibility: visible; } to { opacity:0; visibility: hidden;} }
+@-moz-keyframes fadeOut { from { opacity:1; visibility: visible; } to { opacity:0; visibility: hidden; } }
+@keyframes fadeOut { from { opacity:1; visibility: visible; } to { opacity:0; visibility: hidden;} }
 
 .fade-out {
   opacity:1;
@@ -354,7 +354,6 @@ h2 {
 
   .alert {
     position: absolute;
-    bottom: 0px;
     width: 60%;
     padding: 10px;
     margin-left: -30%;
@@ -374,6 +373,21 @@ h2 {
 
     .alert-info {
       background: lightyellow;
+    }
+
+    .close {
+      background: url("../img/close.png") no-repeat 0 0;
+      width: 16px;
+      height: 16px;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+    }
+
+    &.fade-out {
+      -webkit-animation-delay: 2s;
+      -moz-animation-delay: 2s;
+      animation-delay: 2s;
     }
   }
 }
