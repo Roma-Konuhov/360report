@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Table from './Grid/Table';
 
-class Relations extends Component {
+class Users extends Component {
   constructor(props) {
     super(props);
 
@@ -10,21 +10,18 @@ class Relations extends Component {
     };
 
     this.propsDbToScreenMap = {
-      'responder': 'Responder',
-      'reviewee': 'Reviewee',
-      'relation': 'Relation',
-      'responderEmail': 'Responder email',
-      'revieweeEmail': 'Reviewee email',
+      'name': 'Name',
+      'email': 'Email',
     };
-    this.columns = ['responder', 'responderEmail', 'reviewee', 'revieweeEmail', 'relation'];
+    this.columns = ['name', 'email'];
   }
 
   componentWillMount() {
-    this.setState({ data: this.props.peopleRelations });
+    this.setState({ data: this.props.users });
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ data: nextProps.peopleRelations });
+    this.setState({ data: nextProps.users });
   }
 
   render() {
@@ -41,4 +38,4 @@ class Relations extends Component {
   }
 }
 
-export default Relations;
+export default Users;

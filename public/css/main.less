@@ -335,3 +335,45 @@ h2 {
     }
   }
 }
+
+.container {
+  position: relative;
+
+  .spinner {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #eee url("../img/spinner.gif") no-repeat 50% 50%;
+    opacity: 0.5;
+    height: 100%;
+    bottom: 0;
+    right: 0;
+    z-index: 10000;
+  }
+
+  .alert {
+    position: absolute;
+    bottom: 0px;
+    width: 60%;
+    padding: 10px;
+    margin-left: -30%;
+    top: 15px;
+    left: 50%;
+    border: 1px solid #666;
+    text-align: center;
+    z-index: 10;
+
+    .alert-success {
+      background: green;
+    }
+
+    .alert-danger {
+      background: red;
+    }
+
+    .alert-info {
+      background: lightyellow;
+    }
+  }
+}

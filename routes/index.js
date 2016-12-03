@@ -40,6 +40,7 @@ module.exports = function(app) {
   app.get('/reviewees-by-consultants', consultantController.revieweesGet);
   app.get('/reviewees-by-managers', managerController.revieweesGet);
   app.get('/people-relations', relationController.revieweesGet);
+  app.get('/users', userController.usersGet);
   app.get('/consultant/report/:id', consultantController.reportGet);
   app.get('/consultant/statistics/:id', consultantController.statisticsGet);
   app.get('/manager/report/:id', managerController.reportGet);

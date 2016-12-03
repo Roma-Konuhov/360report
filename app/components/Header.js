@@ -2,6 +2,7 @@ import React from 'react';
 import { IndexLink, Link } from 'react-router';
 import { connect } from 'react-redux';
 import Display from './Display';
+import Messages from './Messages';
 
 class Header extends React.Component {
   render() {
@@ -10,6 +11,7 @@ class Header extends React.Component {
     return (
       <nav className="navbar navbar-default navbar-static-top">
         <div className="container">
+          <Messages messages={this.props.messages}/>
           <Display if={this.props.error} nowrap="true">
             <Error error={this.props.error} />
           </Display>
@@ -25,6 +27,9 @@ class Header extends React.Component {
               <Display if={this.props.peopleRelations} nowrap="true">
                 <li><Link to="/people-relations" activeStyle={active}>Relations</Link></li>
               </Display>
+              <Display if={this.props.users} nowrap="true">
+                <li><Link to="/users" activeStyle={active}>Users</Link></li>
+              </Display>
             </ul>
             <div className="review-reports-title"><div className="review-subtitle">360 review</div><div className="reports-subtitle">reports</div></div>
           </div>
@@ -37,7 +42,8 @@ class Header extends React.Component {
 const mapStateToProps = (state) => {
   return {
     token: state.auth.token,
-    user: state.auth.user
+    user: state.auth.user,
+    messages: state.messages
   };
 };
 

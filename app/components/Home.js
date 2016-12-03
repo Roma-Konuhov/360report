@@ -1,15 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import FileUploadContainer from './FileUploadContainer';
-import Messages from './Messages';
+import Display from './Display';
+import Spinner from './Spinner';
 
 class Home extends React.Component {
-
-
   render() {
     return (
       <div className="container">
-        <Messages messages={this.props.messages}/>
+        <Display if={this.props.httpRequestCounter}>
+          <Spinner />
+        </Display>
         <FileUploadContainer {...this.props} />
       </div>
     );
@@ -18,7 +19,7 @@ class Home extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    messages: state.messages
+    httpRequestCounter: state.http.requestCounter
   };
 };
 

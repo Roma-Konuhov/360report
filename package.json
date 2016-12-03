@@ -30,6 +30,7 @@
     "express-validation": "^1.0.1",
     "express-validator": "^2.21.0",
     "highcharts": "^5.0.2",
+    "immutable": "^3.8.1",
     "jade": "^1.11.0",
     "joi": "^10.0.1",
     "jsonwebtoken": "^5.7.0",
