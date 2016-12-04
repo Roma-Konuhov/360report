@@ -37,7 +37,9 @@ class FileUploadContainer extends Component {
         <Display if={this.props.peopleRelations} nowrap="true">
           <FileUploader label="Manager report (csv file)" name="manager_report" {...this.props} />
         </Display>
-        <FileUploader label="People relations (csv file)" name="people_relations" {...this.props} />
+        <Display if={this.props.users} nowrap="true">
+          <FileUploader label="People relations (csv file)" name="people_relations" {...this.props} />
+        </Display>
         <FileUploader label="Users names and emails (csv file)" name="users" {...this.props} />
       </div>
     );
