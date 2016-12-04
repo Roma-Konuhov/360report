@@ -1,3 +1,5 @@
+import { refresh, refreshAll } from './appState';
+
 function success(message) {
   return {
     type: 'UPLOAD_SUCCESS',
@@ -10,19 +12,6 @@ function fail(messages) {
     type: 'UPLOAD_FAILURE',
     messages
   };
-}
-
-function checkUpdatesFor(inputName) {
-  return {
-    type: 'CHECK_UPDATES_FOR_UPLOADED_FILE',
-    inputName
-  };
-}
-
-export function resetFileUploader() {
-  return {
-    type: 'UPLOAD_RESET'
-  }
 }
 
 export function fileUploader(formData, inputName) {
@@ -49,7 +38,11 @@ export function fileUploader(formData, inputName) {
       xhr.send(formData);
     }).then((response) => {
       dispatch(success(response));
-      dispatch(checkUpdatesFor(inputName));
+      if (inputName === 'users') {
+        dispatch(refreshAll());
+      } else {
+        dispatch(refresh(inputName))
+      }
     }).catch(messages => {
       dispatch(fail(messages));
     });
