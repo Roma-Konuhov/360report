@@ -1,5 +1,6 @@
 import React from 'react';
 import Chart from './Graph/Highcharts.react';
+import Display from './Display';
 import InfoBlock from './Text/InfoBlock';
 import TextBlockBeforeStat from './Text/TextBlockBeforeStat';
 import TextBlockAfterStat from './Text/TextBlockAfterStat';
@@ -74,7 +75,9 @@ class Report extends React.Component {
         {this.props.reports.map((report, idx) => {
           return (
             <div key={`chart-wrapper-${idx}`} className="chart-block">
-              <PersonalStatistics data={this.props.statistics[idx]} />
+              <Display if={this.props.statistics[idx]}>
+                <PersonalStatistics data={this.props.statistics[idx]} />
+              </Display>
               <div className="title">{report.text}</div>
               <div className="chart-wrapper">
               <Chart
@@ -89,7 +92,9 @@ class Report extends React.Component {
           )
         })}
         <TextBlockBeforeStat />
-        <Statistics data={this.addDataByField(this.props.statistics, this.props.reports, 'text')} />
+        <Display if={this.props.statistics}>
+          <Statistics data={this.addDataByField(this.props.statistics, this.props.reports, 'text')} />
+        </Display>
         <TextBlockAfterStat />
       </div>
     );

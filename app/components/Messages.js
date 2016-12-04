@@ -63,7 +63,6 @@ class Messages extends React.Component {
   }
 
   render() {
-    console.log('MESSAGE STORAGE', this.messageStorage)
     return !_.isEmpty(this.messageStorage) ? (
       <div className="message-container">
         {this.renderMessages(this.messageStorage)}
