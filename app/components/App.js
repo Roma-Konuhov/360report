@@ -8,19 +8,12 @@ import { fetchPeopleRelations } from '../actions/peopleRelations';
 import { fetchUsers } from '../actions/users';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      error: {}
-    };
-  }
 
   componentDidMount() {
     this.props.dispatch(fetchRevieweesByConsultants());
     this.props.dispatch(fetchRevieweesByManagers());
     this.props.dispatch(fetchPeopleRelations());
     this.props.dispatch(fetchUsers());
-    //window.addEventListener('load:data', this.loadData.bind(this), { once: true });
   }
 
   render() {

@@ -37,7 +37,7 @@ const mapDispatchOnProps = (dispatch) => {
     handleChange: (e) => {
       var formData = new FormData();
       formData.append(e.target.name, e.target.files[0]);
-      dispatch(fileUploader(formData));
+      dispatch(fileUploader(formData, e.target.name));
       e.target.value = '';
     }
   }

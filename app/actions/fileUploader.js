@@ -1,4 +1,3 @@
-
 function success(message) {
   return {
     type: 'UPLOAD_SUCCESS',
@@ -13,7 +12,20 @@ function fail(messages) {
   };
 }
 
-export function fileUploader(formData) {
+function checkUpdatesFor(inputName) {
+  return {
+    type: 'CHECK_UPDATES_FOR_UPLOADED_FILE',
+    inputName
+  };
+}
+
+export function resetFileUploader() {
+  return {
+    type: 'UPLOAD_RESET'
+  }
+}
+
+export function fileUploader(formData, inputName) {
   return (dispatch) => {
     dispatch({type: 'CLEAR_MESSAGES'});
     dispatch({type: 'SEND_REQUEST'});
@@ -37,6 +49,7 @@ export function fileUploader(formData) {
       xhr.send(formData);
     }).then((response) => {
       dispatch(success(response));
+      dispatch(checkUpdatesFor(inputName));
     }).catch(messages => {
       dispatch(fail(messages));
     });

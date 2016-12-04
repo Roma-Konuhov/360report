@@ -352,42 +352,48 @@ h2 {
     z-index: 10000;
   }
 
-  .alert {
+  .message-container {
     position: absolute;
     width: 60%;
-    padding: 10px;
     margin-left: -30%;
-    top: 15px;
+    top: 10px;
     left: 50%;
-    border: 1px solid #666;
-    text-align: center;
     z-index: 10;
 
-    .alert-success {
-      background: green;
-    }
+    .alert {
+      display: block;
+      padding: 10px;
+      margin: 5px 0;
+      text-align: center;
+      border: 1px solid #666;
+      position: relative;
 
-    .alert-danger {
-      background: red;
-    }
+      .alert-success {
+        background: green;
+      }
 
-    .alert-info {
-      background: lightyellow;
-    }
+      .alert-danger {
+        background: red;
+      }
 
-    .close {
-      background: url("../img/close.png") no-repeat 0 0;
-      width: 16px;
-      height: 16px;
-      position: absolute;
-      top: 5px;
-      right: 5px;
-    }
+      .alert-info {
+        background: lightyellow;
+      }
 
-    &.fade-out {
-      -webkit-animation-delay: 5s;
-      -moz-animation-delay: 5s;
-      animation-delay: 5s;
+      .close {
+        background: url("../img/close.png") no-repeat 0 0;
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+      }
+
+      &.fade-out {
+        -webkit-animation-delay: 5s;
+        -moz-animation-delay: 5s;
+        animation-delay: 5s;
+      }
     }
   }
 }
