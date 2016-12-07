@@ -1,0 +1,20 @@
+{
+  "name": "360report",
+  "description": "Generator of 360 review results",
+  "authors": [
+    "Roman <rkonuhov@cogniance.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/vendor/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap-filestyle": "^1.2.1",
+    "bootstrap": "^3.3.7"
+  }
+}
