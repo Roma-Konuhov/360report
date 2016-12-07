@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Generator of 360 review results",
   "scripts": {
-    "build": "webpack --display-error-details",
+    "build": "webpack --display-error-details && lessc -x public/css/main.less public/css/main.css",
     "postinstall": "npm run build",
     "prestart": "webpack",
     "start": "node server.js",

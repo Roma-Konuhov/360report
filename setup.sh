@@ -10,3 +10,6 @@ npm -g i webpack
 npm -g i bower
 npm i
 bower install
+npm run build
+npm install -g pm2
+pm2 start server.js

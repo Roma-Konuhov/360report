@@ -44,7 +44,12 @@ var config = {
           ]
         }
 */
-      }
+      },
+/*      {
+        test: /\.less$/,
+        exclude: /node_modules/,
+        loader: "style-loader!css-loader!less-loader?strictMath&noIeCompat"
+      }*/
     ]
   }
 };

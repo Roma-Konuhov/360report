@@ -113,7 +113,7 @@ app.use(function(err, req, res, next) {
   }
 });
 
-if ('development' === app.get('env')) {
+if ('production' === app.get('env')) {
   process.on('uncaughtException', (err) => {
     logger.error(err);
   });
