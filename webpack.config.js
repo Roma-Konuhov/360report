@@ -4,7 +4,7 @@ var webpack = require('webpack');
 var config = {
   devtool: 'inline-source-map',
   entry: [
-//    'webpack-hot-middleware/client',
+    'webpack-hot-middleware/client?path=http://localhost:3000/__webpack_hmr',
     './app/main'
   ],
   output: {
@@ -13,7 +13,7 @@ var config = {
     publicPath: '/js'
   },
   plugins: [
-    //new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.DefinePlugin({
@@ -26,8 +26,7 @@ var config = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-/*
-        query: {
+        /*query: {
           plugins: [
             ['react-transform', {
               transforms: [
@@ -42,8 +41,7 @@ var config = {
               ]
             }]
           ]
-        }
-*/
+        }*/
       },
 /*      {
         test: /\.less$/,

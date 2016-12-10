@@ -22,12 +22,27 @@ var sendHttpError = require('./middleware/sendHttpError');
 var HttpError = require('./lib/error').HttpError;
 var errorHandler = require('errorhandler');
 
-// Is used to check DB connection on bootstrap stage
-require('./db');
-
 // ES6 Transpiler
 require('babel-core/register');
 require('babel-polyfill');
+
+var app = express();
+var compiler = webpack(webpackConfig);
+
+if (app.get('env') === 'development') {
+  app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: true,
+    publicPath: webpackConfig.output.publicPath,
+    silent: true,
+    stats: 'errors-only',
+  }));
+  app.use(require('webpack-hot-middleware')(compiler, {
+    path: '/__webpack_hmr'
+  }));
+}
+
+// Is used to check DB connection on bootstrap stage
+require('./db');
 
 // Models
 var User = require('./models/User');
@@ -35,9 +50,6 @@ var User = require('./models/User');
 // React and Server-Side Rendering
 var routes = require('./app/routes');
 var configureStore = require('./app/store/configureStore').default;
-
-var app = express();
-var compiler = webpack(webpackConfig);
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -48,16 +60,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(expressValidator());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-/*
-if (app.get('env') === 'development') {
-  app.use(require('webpack-dev-middleware')(compiler, {
-    noInfo: true,
-    publicPath: webpackConfig.output.publicPath
-  }));
-  app.use(require('webpack-hot-middleware')(compiler));
-}
-*/
 
 // Routes
 require('./routes')(app);
