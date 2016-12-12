@@ -21,6 +21,7 @@ export default function messages(state = {}, action) {
     case 'RESET_PASSWORD_SUCCESS':
     case 'CONTACT_FORM_SUCCESS':
     case 'UPLOAD_SUCCESS':
+    case 'EXPORT_SUCCESS':
       return {
         success: action.messages
       };

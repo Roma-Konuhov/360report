@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import Chart from './Graph/Highcharts.react';
 import Display from './Display';
 import InfoBlock from './Text/InfoBlock';
@@ -70,7 +71,7 @@ class Report extends React.Component {
     return (
       <div className="container">
         <h1>360&deg; Feedback Report</h1>
-        <UserData id={this.props.userId} />
+        <UserData user={this.props.user} />
         <InfoBlock />
         {this.props.reports.map((report, idx) => {
           return (
@@ -78,7 +79,7 @@ class Report extends React.Component {
               <Display if={this.props.statistics[idx]}>
                 <PersonalStatistics data={this.props.statistics[idx]} />
               </Display>
-              <div className="title">{report.text}</div>
+              <table className="title"><tbody><tr><td>{report.text}</td></tr></tbody></table>
               <div className="chart-wrapper">
               <Chart
                 container={`question-${idx}`}
@@ -102,7 +103,7 @@ class Report extends React.Component {
 }
 
 Report.propTypes = {
-  userId: React.PropTypes.string.isRequired,
+  user: React.PropTypes.object.isRequired,
   reports: React.PropTypes.array.isRequired,
   statistics: React.PropTypes.array.isRequired
 };

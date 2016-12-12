@@ -3,7 +3,7 @@
 
   "env": {
     "development": {
-      "plugins": ["react-hot-loader/babel", "rewire"]
+      "plugins": ["rewire"]
     }
   }
 }

@@ -1,0 +1,149 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    link(rel='stylesheet', href='vendor/bootstrap/dist/css/bootstrap.css')
+    link(rel='stylesheet', href='vendor/highcharts/css/highcharts.css')
+    link(rel='stylesheet', href='css/main.css')
+    style.
+      .container {
+        width: 1170px !important;
+      }
+      .highcharts-point.highcharts-color-0:not(:first-child) {
+        fill: #888;
+        stroke: #888;
+      }
+      .highcharts-point.highcharts-color-0:first-child {
+        fill: #ddd;
+        stroke: #ddd;
+      }
+      .chart-block:before {
+        top: 120px;
+        height: 332px;
+      }
+      .highcharts-axis-labels.highcharts-xaxis-labels,
+      .highcharts-axis-labels.highcharts-yaxis-labels {
+        font-size: 14px;
+        font-family: 'Trebuchet MS';
+      }
+
+      .personal-statistics .data-table td.avg_norm {
+        color: #00b0f0 !important;
+      }
+
+      .personal-statistics .data-table td.self_gap.positive,
+      .personal-statistics .data-table td.avg_gap.positive {
+        color: #1ab230 !important;
+      }
+
+      .personal-statistics .data-table td.self_gap.negative,
+      .personal-statistics .data-table td.avg_gap.negative {
+        color: #f00 !important;
+      }
+body
+    #app!= html
+
+    script(src='vendor/jquery/dist/jquery.min.js')
+    script(src='vendor/bootstrap/dist/js/bootstrap.min.js')
+    script(src='vendor/bootstrap-filestyle/src/bootstrap-filestyle.min.js')
+    script(src='vendor/highcharts/js/highcharts.js')
+    script(src='vendor/lodash/dist/lodash.min.js')
+    script.
+      window.INITIAL_STATE = !{JSON.stringify(initialState)}
+
+      $(function () {
+        for (var i = 0; i < window.INITIAL_STATE.report.answers.length; i++) {
+          Highcharts.chart('question-' + i, {
+            credits: {
+              enabled: false
+            },
+            chart: {
+              type: 'bar',
+              animation: false,
+              borderWidth: 0,
+              showAxes: true,
+              marginLeft: 150,
+              marginRight: 50,
+              marginBottom: 30,
+              spacingBottom: 0,
+              spacingLeft: 0,
+              spacingRight: 0,
+              spacingTop: 0,
+              _style: {
+                fontFamily: 'Trebuchet MS',
+                fontSize: '14px'
+              },
+            },
+            title: {
+              text: '',
+              style: {"font-family": "Trebuchet MS", "font-size": "20px", "font-weight": "bold"},
+              align: 'left',
+              verticalAlign: 'middle'
+            },
+            plotOptions: {
+              series: {
+                animation: false,
+                dataLabels: {
+                  enabled: true,
+                  align: 'center',
+                  allowOverlap: true,
+                  inside: true,
+                  color: '#ffffff',
+                  verticalAlign: 'middle',
+                  style: {fontSize: "18px", "text-shadow": "none"},
+                }
+              }
+            },
+            legend: {
+              enabled: false
+            },
+            xAxis: {
+              min: 0,
+              max: window.INITIAL_STATE.report.answers[i].relationLabels.length - 1,
+              title: null,
+              tickInterval: 1,
+              categories: getXCategories(window.INITIAL_STATE.report.answers[i].relationLabels, window.INITIAL_STATE.report.answers[i].respondersNumber),
+              labels: {
+                style: {
+                  fontSize: '14px'
+                }
+              }
+            },
+            yAxis: {
+              min: 0,
+              max: window.INITIAL_STATE.report.answers[i].answerLabels.length - 1,
+              tickInterval: 1,
+              title: null,
+              opposite: true,
+              labels: {
+                style: {
+                  fontSize: '14px'
+                },
+                formatter: function() {
+                  return this.value && window.INITIAL_STATE.report.answers[i].answerLabels[this.value] + '<br>(' + this.value + ')' || '';
+                }
+              }
+            },
+            series: [{
+              data: _.map(window.INITIAL_STATE.report.answers[i].avgAnswers, function(value, idx) {
+                return {
+                  dataLabels: {
+                    enabled: !!value,
+                    color: idx > 0 ? '#ffffff' : '#000000',
+                  },
+                  color: idx > 0 ? '#888888' : '#dddddd',
+                  y: value
+                }
+              }),
+              fillColor: '#dddddd',
+            }]
+          });
+        }
+        function getXCategories(relationLabels, respondersNumber) {
+          return _.map(relationLabels, function(label, idx) {
+            return label + '(' + respondersNumber[idx] + ')';
+          });
+        }
+      });
+
+    block content

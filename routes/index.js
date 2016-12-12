@@ -45,4 +45,5 @@ module.exports = function(app) {
   app.get('/consultant/statistics/:id', consultantController.statisticsGet);
   app.get('/manager/report/:id', managerController.reportGet);
   app.get('/manager/statistics/:id', managerController.statisticsGet);
+  app.post('/consultant/export/:format/:id', consultantController.exportFilePost);
 };

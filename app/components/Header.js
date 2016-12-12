@@ -3,6 +3,7 @@ import { IndexLink, Link } from 'react-router';
 import { connect } from 'react-redux';
 import Display from './Display';
 import Messages from './Messages';
+import { exportPdf, exportPng } from '../actions/reportExport';
 
 class Header extends React.Component {
   render() {
@@ -19,7 +20,7 @@ class Header extends React.Component {
             <IndexLink to="/" className="logo"></IndexLink>
             <ul className="nav navbar-nav">
               <Display if={this.props.revieweesByConsultants} nowrap="true">
-                <li><IndexLink to="/reviewees-by-consultants" activeStyle={active}>By Constultans</IndexLink></li>
+                <li><Link to="/reviewees-by-consultants" activeStyle={active}>By Constultans</Link></li>
               </Display>
               <Display if={this.props.revieweesByManagers} nowrap="true">
                 <li><Link to="/reviewees-by-managers" activeStyle={active}>By Managers</Link></li>
@@ -29,6 +30,12 @@ class Header extends React.Component {
               </Display>
               <Display if={this.props.users} nowrap="true">
                 <li><Link to="/users" activeStyle={active}>Users</Link></li>
+              </Display>
+              <Display if={this.props.report.answers} nowrap="true">
+                <li><Link to="/export-pdf" activeStyle={active} onClick={this.props.handleExportToPDF}>Export PDF</Link></li>
+              </Display>
+              <Display if={this.props.report.answers} nowrap="true">
+                <li><Link to="/export-png" activeStyle={active} onClick={this.props.handleExportToPNG}>Export PNG</Link></li>
               </Display>
             </ul>
             <div className="review-reports-title"><div className="review-subtitle">360 review</div><div className="reports-subtitle">reports</div></div>
@@ -47,4 +54,18 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(Header);
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  handleExportToPDF: (e) => {
+    e.preventDefault();
+    dispatch(exportPdf(ownProps.params.id));
+  },
+  handleExportToPNG: (e) => {
+    e.preventDefault();
+    dispatch(exportPng(ownProps.params.id));
+  }
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Header);

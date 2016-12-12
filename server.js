@@ -115,11 +115,9 @@ app.use(function(err, req, res, next) {
   }
 });
 
-if ('production' === app.get('env')) {
-  process.on('uncaughtException', (err) => {
-    logger.error(err);
-  });
-}
+process.on('uncaughtException', (err) => {
+  logger.error(err);
+});
 
 app.listen(config.get('port'), function() {
   console.log('Express server listening on port ' + config.get('port'));

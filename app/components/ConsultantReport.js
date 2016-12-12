@@ -1,20 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Report from './Report';
-import { fetchReportAnswers } from '../actions/reportAnswers';
-import { fetchReportStatistics } from '../actions/reportStatistics';
+import { fetchReportStatistics, fetchReportAnswers, fetchReportUser } from '../actions/report';
 
 class ConsultantReport extends React.Component {
   componentDidMount() {
     const id = this.props.params.id;
     this.props.dispatch(fetchReportAnswers('consultant', id));
     this.props.dispatch(fetchReportStatistics('consultant', id));
+    this.props.dispatch(fetchReportUser(id));
   }
 
   render() {
     return (
       <Report
-        userId={this.props.params.id}
+        user={this.props.user}
         reports={this.props.reports}
         statistics={this.props.statistics}
       />
@@ -25,7 +25,8 @@ class ConsultantReport extends React.Component {
 const mapStateOnProps = (state) => {
   return {
     reports: state.report.answers,
-    statistics: state.report.statistics
+    statistics: state.report.statistics,
+    user: state.report.user
   }
 };
 

@@ -27,6 +27,10 @@ export default function getRoutes(store) {
       type: 'CLEAR_MESSAGES'
     });
   };
+  const clearReport = () => {
+    store.dispatch({ type: 'CLEAR_MESSAGES' });
+    store.dispatch({ type: 'CLEAR_REPORT' });
+  };
   return (
     <Route path="/" component={App}>
       <IndexRoute component={Home} onLeave={clearMessages}/>
@@ -35,8 +39,8 @@ export default function getRoutes(store) {
       <Route path="/reviewees-by-managers" component={RevieweesByManager} onLeave={clearMessages}/>
       <Route path="/people-relations" component={Relations} onLeave={clearMessages}/>
       <Route path="/users" component={Users} onLeave={clearMessages}/>
-      <Route path="/consultant/report/:id" component={ConsultantReport} onLeave={clearMessages}/>
-      <Route path="/manager/report/:id" component={ManagerReport} onLeave={clearMessages}/>
+      <Route path="/consultant/report/:id" component={ConsultantReport} onLeave={clearReport}/>
+      <Route path="/manager/report/:id" component={ManagerReport} onLeave={clearReport}/>
       <Route path="*" component={NotFound} onLeave={clearMessages}/>
     </Route>
   );

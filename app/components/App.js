@@ -58,7 +58,8 @@ const mapStateToProps = (state) => {
     revieweesByManagers: state.entities.revieweesByManagers,
     peopleRelations: state.entities.peopleRelations,
     users: state.entities.users,
-    appState: state.appState
+    appState: state.appState,
+    report: state.report
   };
 };
 
