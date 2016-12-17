@@ -30,20 +30,25 @@ var consultantController = require('../controllers/consultant');
 var managerController = require('../controllers/manager');
 var relationController = require('../controllers/relation');
 var userController = require('../controllers/user');
+var exportController = require('../controllers/export');
 
 /*
  * Routes
  */
 module.exports = function(app) {
   app.post('/upload', upload, fileController.upload);
-  app.get('/user/:id', userController.userGet);
-  app.get('/reviewees-by-consultants', consultantController.revieweesGet);
-  app.get('/reviewees-by-managers', managerController.revieweesGet);
-  app.get('/people-relations', relationController.revieweesGet);
   app.get('/users', userController.usersGet);
+  app.get('/user/:id', userController.userGet);
+  app.get('/people-relations', relationController.revieweesGet);
+  app.get('/export/:filename', exportController.exportGet);
+
+  app.get('/reviewees-by-consultants', consultantController.revieweesGet);
   app.get('/consultant/report/:id', consultantController.reportGet);
   app.get('/consultant/statistics/:id', consultantController.statisticsGet);
+  app.post('/consultant/export/:format/:id', consultantController.exportFilePost);
+
+  app.get('/reviewees-by-managers', managerController.revieweesGet);
   app.get('/manager/report/:id', managerController.reportGet);
   app.get('/manager/statistics/:id', managerController.statisticsGet);
-  app.post('/consultant/export/:format/:id', consultantController.exportFilePost);
+  app.post('/manager/export/:format/:id', managerController.exportFilePost);
 };

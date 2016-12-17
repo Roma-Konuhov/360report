@@ -53,3 +53,36 @@ exports.statisticsGet = function(req, res) {
     res.json(result)
   });
 };
+
+exports.exportFilePost = function(req, res, next) {
+  var id = req.params.id;
+  var ExportController = require('./export');
+
+  var getReportAnswers = function(id, cb) {
+    async.waterfall([
+      ManagerReport.getReport.bind(ManagerReport, id),
+      ManagerReport.regroupBySeries.bind(ManagerReport),
+    ], cb);
+  };
+
+  async.parallel({
+    answers: getReportAnswers.bind(ManagerReport, id),
+    statistics: ManagerReport.getStatistics.bind(ManagerReport, id),
+    user: User.findById.bind(User, id),
+  }, function(err, reportConfig) {
+    logger.info("report config: %j", reportConfig);
+    if (err) {
+      logger.error(err);
+      return next(new HttpError(400, err.message));
+    }
+
+    reportConfig['uriPrefix'] = 'manager';
+
+    ExportController.exportFile(req, res, reportConfig, function(err, response) {
+      if (err) {
+        return next(new HttpError(400, err.message));
+      }
+      res.json(response);
+    });
+  });
+};

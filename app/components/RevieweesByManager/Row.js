@@ -5,7 +5,6 @@ import { hashHistory } from 'react-router';
 
 class Row extends BaseRow {
   onRowClick(row, e) {
-    console.log(row.id)
     var pathname = '/manager/report/' + row.id;
     hashHistory.push(pathname);
   }

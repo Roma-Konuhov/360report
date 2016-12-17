@@ -1,16 +1,20 @@
 var _ = require('lodash');
 var phantom = require("phantom");
 //var pdf = require('html-pdf');
+var logger = require('../lib/logger')(module);
 var path = require('path');
 var os = require('os');
 var q = require('q');
 
 
-exports.exportFile = function(url, format = 'png', cb = _.identity()) {
-  var tmpDir = os.tmpdir();
-  var filepath = path.join(tmpDir, (+new Date()) + '.' + format);
+exports.exportFile = function(url, destDir = '', format = 'png', cb = _.identity()) {
+  var tmpDir = destDir || os.tmpdir();
+  var filename = (+new Date()) + '.' + format;
+  var filepath = path.join(tmpDir, filename);
   var page, ph;
 
+  logger.info('Directory to export: "%s"', tmpDir);
+  logger.info('Filename to export: "%s"', filename);
   phantom.create()
     .then(function (_ph) {
       ph = _ph;
@@ -40,7 +44,7 @@ exports.exportFile = function(url, format = 'png', cb = _.identity()) {
     })
     .then(function () {
       ph.exit();
-      cb(null, filepath);
+      cb(null, { filepath: filepath, filename: filename });
     })
     .catch(function () {
       ph.exit();

@@ -13,7 +13,7 @@ function fail(message) {
   };
 }
 
-export function exportPdf(id) {
+export function exportConsultantReportToPdf(id) {
   return (dispatch) => {
     dispatch({ type: 'CLEAR_MESSAGES' });
     dispatch({ type: 'SEND_REQUEST' });
@@ -25,6 +25,7 @@ export function exportPdf(id) {
       if (response.ok) {
         return response.json().then((json) => {
           dispatch(success(json.message));
+          window.location = '/export/' + json.filename;
         });
       } else {
         return response.json().then((json) => {
@@ -35,7 +36,7 @@ export function exportPdf(id) {
   };
 }
 
-export function exportPng(id) {
+export function exportConsultantReportToPng(id) {
   return (dispatch) => {
     dispatch({ type: 'CLEAR_MESSAGES' });
     dispatch({ type: 'SEND_REQUEST' });
@@ -47,6 +48,53 @@ export function exportPng(id) {
       if (response.ok) {
         return response.json().then((json) => {
           dispatch(success(json.message));
+          window.location = '/export/' + json.filename;
+        });
+      } else {
+        return response.json().then((json) => {
+          dispatch(fail(json.message));
+        });
+      }
+    });
+  };
+}
+
+export function exportManagerReportToPdf(id) {
+  return (dispatch) => {
+    dispatch({ type: 'CLEAR_MESSAGES' });
+    dispatch({ type: 'SEND_REQUEST' });
+    return fetch(`/manager/export/pdf/${id}`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+    }).then((response) => {
+      dispatch({ type: 'RECEIVE_REQUEST' });
+      if (response.ok) {
+        return response.json().then((json) => {
+          dispatch(success(json.message));
+          window.location = '/export/' + json.filename;
+        });
+      } else {
+        return response.json().then((json) => {
+          dispatch(fail(json.message));
+        });
+      }
+    });
+  };
+}
+
+export function exportManagerReportToPng(id) {
+  return (dispatch) => {
+    dispatch({ type: 'CLEAR_MESSAGES' });
+    dispatch({ type: 'SEND_REQUEST' });
+    return fetch(`/manager/export/png/${id}`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+    }).then((response) => {
+      dispatch({ type: 'RECEIVE_REQUEST' });
+      if (response.ok) {
+        return response.json().then((json) => {
+          dispatch(success(json.message));
+          window.location = '/export/' + json.filename;
         });
       } else {
         return response.json().then((json) => {
