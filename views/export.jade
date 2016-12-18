@@ -6,6 +6,12 @@ html
     link(rel='stylesheet', href='vendor/highcharts/css/highcharts.css')
     link(rel='stylesheet', href='css/main.css')
     style.
+      #navbar, .navbar {
+        display: none !important;
+      }
+      .export-panel {
+        display: none;
+      }
       .container {
         width: 1170px !important;
       }
@@ -26,7 +32,14 @@ html
         font-size: 14px;
         font-family: 'Trebuchet MS';
       }
-
+      .highcharts-container .avg_norm {
+        stroke-width: 10px;
+        stroke: #00b0f0;
+      }
+      .highcharts-container .avg_score {
+        stroke-width: 10px;
+        stroke: #000;
+      }
       .personal-statistics .data-table td.avg_norm {
         color: #00b0f0 !important;
       }
@@ -122,15 +135,44 @@ body
                 formatter: function() {
                   return this.value && window.INITIAL_STATE.report.answers[i].answerLabels[this.value] + '<br>(' + this.value + ')' || '';
                 }
-              }
+              },
+              plotLines: [{
+                className: 'avg_score',
+                color: '#000',
+                value: window.INITIAL_STATE.report.statistics[i].avg_score,
+                width: 10,
+                label: {
+                  text: window.INITIAL_STATE.report.statistics[i].avg_score,
+                  verticalAlign: 'bottom',
+                  rotation: 0,
+                  textAlign: 'center',
+                  y: 20,
+                  x: 0
+                }
+              }, {
+                className: 'avg_norm',
+                color: '#00b0f0',
+                value: window.INITIAL_STATE.report.statistics[i].avg_norm,
+                width: 10,
+                label: {
+                  text: window.INITIAL_STATE.report.statistics[i].avg_norm,
+                  verticalAlign: 'bottom',
+                  rotation: 0,
+                  textAlign: 'center',
+                  y: 20,
+                  x: 0
+                }
+              }]
             },
             series: [{
               data: _.map(window.INITIAL_STATE.report.answers[i].avgAnswers, function(value, idx) {
                 return {
                   dataLabels: {
+                    className: 'data_label',
                     enabled: !!value,
                     color: idx > 0 ? '#ffffff' : '#000000',
                   },
+                  className: 'data_series',
                   color: idx > 0 ? '#888888' : '#dddddd',
                   y: value
                 }

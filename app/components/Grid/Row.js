@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import Cell from './Cell';
 
 class Row extends Component {
@@ -13,10 +12,6 @@ class Row extends Component {
     );
   }
 }
-
-Row.defaultProps = {
-  onRowClick: _.identity
-};
 
 Row.propTypes = {
   row: React.PropTypes.object.isRequired,
