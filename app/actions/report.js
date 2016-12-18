@@ -27,6 +27,12 @@ function fail(message) {
   };
 }
 
+export function clearReport() {
+  return {
+    type: 'CLEAR_REPORT'
+  };
+}
+
 export function fetchReportStatistics(entityType, id) {
   return (dispatch) => {
     dispatch({ type: 'CLEAR_MESSAGES' });

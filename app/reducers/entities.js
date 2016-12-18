@@ -2,7 +2,8 @@ const initialState = {
   revieweesByConsultants: [],
   revieweesByManagers: [],
   peopleRelations: [],
-  users: []
+  users: [],
+  lms: [],
 };
 
 export default function entities(state = initialState , action) {
@@ -22,6 +23,10 @@ export default function entities(state = initialState , action) {
     case 'ADD_USERS':
       return Object.assign({}, state, {
         users: action.items
+      });
+    case 'ADD_LMS':
+      return Object.assign({}, state, {
+        lms: action.items
       });
     default:
       return state;

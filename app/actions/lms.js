@@ -1,7 +1,7 @@
 
 function success(items) {
   return {
-    type: 'ADD_USERS',
+    type: 'ADD_LMS',
     items
   };
 }
@@ -13,11 +13,11 @@ function fail(message) {
   };
 }
 
-export function fetchUsers() {
+export function fetchLMs() {
   return (dispatch) => {
     dispatch({ type: 'CLEAR_MESSAGES' });
     dispatch({ type: 'SEND_REQUEST' });
-    return fetch('/users', {
+    return fetch('/lms', {
       method: 'get',
       headers: { 'Content-Type': 'application/json' },
     }).then((response) => {
@@ -34,3 +34,4 @@ export function fetchUsers() {
     });
   };
 }
+

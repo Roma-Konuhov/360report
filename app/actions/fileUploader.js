@@ -7,10 +7,10 @@ function success(message) {
   };
 }
 
-function fail(messages) {
+function fail(message) {
   return {
     type: 'UPLOAD_FAILURE',
-    messages
+    messages: Array.isArray(message) ? message : [message]
   };
 }
 

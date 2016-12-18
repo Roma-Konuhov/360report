@@ -1,20 +1,27 @@
 
 export function refreshAll() {
   return {
-    type: 'REFRESH_ALL_ENTITIES'
+    type: 'APP_STATE_REFRESH_ALL_ENTITIES'
   };
 }
 
 export function refresh(item) {
   return {
-    type: 'REFRESH_ENTITY',
+    type: 'APP_STATE_REFRESH_ENTITY',
     item
   };
 }
 
-export function refreshToInit() {
+export function toggleRowSelection(id) {
   return {
-    type: 'RESET_STATE_TO_INIT'
+    type: 'APP_STATE_PAGES_TOGGLE_SELECTION',
+    id
+  }
+}
+
+export function clearAppState() {
+  return {
+    type: 'APP_STATE_CLEAR'
   };
 }
 

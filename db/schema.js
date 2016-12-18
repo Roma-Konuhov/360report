@@ -12,6 +12,8 @@ var options = {
 exports.userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
+  lm_name: String,
+  lm_email: { type: String, unique: true },
 }, options);
 
 

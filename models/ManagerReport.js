@@ -100,6 +100,10 @@ managerReportSchema.statics.saveCollection = function(data, cb) {
   var reportCollection = [];
   var userCollection = [];
 
+  if (_.isEmpty(data)) {
+    cb('Data are corrupted')
+  }
+
   data.forEach(function(row, idx) {
     var report = new ManagerReport(row);
     var email = User.generateEmailByFullname(row.reviewee);

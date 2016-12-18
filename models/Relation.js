@@ -97,6 +97,10 @@ relationSchema.statics.castRelations = function(data, cb) {
 relationSchema.statics.saveCollection = function(data, cb) {
   var collection = [];
 
+  if (_.isEmpty(data)) {
+    cb('Data are corrupted')
+  }
+
   data.forEach(function(row, idx) {
     var report = new Relation(row);
     report.save(function(err, instance) {

@@ -30,7 +30,11 @@ class Report extends React.Component {
   }
 
   getFormattedAvgValues(data) {
-    let result = []
+    let result = [];
+
+    if (_.isEmpty(data)) {
+      return result;
+    }
 
     if (parseFloat(data.avg_score)) {
       result.push({
@@ -69,7 +73,7 @@ class Report extends React.Component {
 
   render() {
     return (
-      <div className="container">
+      <div>
         <h1>360&deg; Feedback Report</h1>
         <UserData user={this.props.user} />
         <InfoBlock />

@@ -13,11 +13,11 @@ function fail(message) {
   };
 }
 
-export function exportConsultantReportToPdf(id) {
+export function exportReportToPdf(entityType, id) {
   return (dispatch) => {
     dispatch({ type: 'CLEAR_MESSAGES' });
     dispatch({ type: 'SEND_REQUEST' });
-    return fetch(`/consultant/export/pdf/${id}`, {
+    return fetch(`/${entityType}/export/pdf/${id}`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
     }).then((response) => {
@@ -36,11 +36,11 @@ export function exportConsultantReportToPdf(id) {
   };
 }
 
-export function exportConsultantReportToPng(id) {
+export function exportReportToPng(entityType, id) {
   return (dispatch) => {
     dispatch({ type: 'CLEAR_MESSAGES' });
     dispatch({ type: 'SEND_REQUEST' });
-    return fetch(`/consultant/export/png/${id}`, {
+    return fetch(`/${entityType}/export/png/${id}`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
     }).then((response) => {
@@ -59,49 +59,4 @@ export function exportConsultantReportToPng(id) {
   };
 }
 
-export function exportManagerReportToPdf(id) {
-  return (dispatch) => {
-    dispatch({ type: 'CLEAR_MESSAGES' });
-    dispatch({ type: 'SEND_REQUEST' });
-    return fetch(`/manager/export/pdf/${id}`, {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-    }).then((response) => {
-      dispatch({ type: 'RECEIVE_REQUEST' });
-      if (response.ok) {
-        return response.json().then((json) => {
-          dispatch(success(json.message));
-          window.location = '/export/' + json.filename;
-        });
-      } else {
-        return response.json().then((json) => {
-          dispatch(fail(json.message));
-        });
-      }
-    });
-  };
-}
-
-export function exportManagerReportToPng(id) {
-  return (dispatch) => {
-    dispatch({ type: 'CLEAR_MESSAGES' });
-    dispatch({ type: 'SEND_REQUEST' });
-    return fetch(`/manager/export/png/${id}`, {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-    }).then((response) => {
-      dispatch({ type: 'RECEIVE_REQUEST' });
-      if (response.ok) {
-        return response.json().then((json) => {
-          dispatch(success(json.message));
-          window.location = '/export/' + json.filename;
-        });
-      } else {
-        return response.json().then((json) => {
-          dispatch(fail(json.message));
-        });
-      }
-    });
-  };
-}
 

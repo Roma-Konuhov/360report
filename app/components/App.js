@@ -6,7 +6,8 @@ import { fetchRevieweesByConsultants } from '../actions/revieweesByConstultants'
 import { fetchRevieweesByManagers } from '../actions/revieweesByManagers';
 import { fetchPeopleRelations } from '../actions/peopleRelations';
 import { fetchUsers } from '../actions/users';
-import { refreshToInit } from '../actions/appState';
+import { fetchLMs } from '../actions/lms';
+import { clearAppState } from '../actions/appState';
 
 class App extends React.Component {
 
@@ -15,16 +16,20 @@ class App extends React.Component {
     this.props.dispatch(fetchRevieweesByManagers());
     this.props.dispatch(fetchPeopleRelations());
     this.props.dispatch(fetchUsers());
+    this.props.dispatch(fetchLMs());
   }
 
   componentWillUpdate(nextProps) {
-    this.props.dispatch(refreshToInit());
+    if (nextProps.appState.refresh) {
+      this.props.dispatch(clearAppState());
+    }
     switch (nextProps.appState.refresh) {
       case 'all':
         this.props.dispatch(fetchPeopleRelations());
         this.props.dispatch(fetchRevieweesByManagers());
         this.props.dispatch(fetchRevieweesByConsultants());
         this.props.dispatch(fetchUsers());
+        this.props.dispatch(fetchLMs());
         break;
       case 'people_relations':
         this.props.dispatch(fetchPeopleRelations());
@@ -37,6 +42,9 @@ class App extends React.Component {
         break;
       case 'users':
         this.props.dispatch(fetchUsers());
+        break;
+      case 'lms':
+        this.props.dispatch(fetchLMs());
         break;
     }
   }
@@ -58,6 +66,7 @@ const mapStateToProps = (state) => {
     revieweesByManagers: state.entities.revieweesByManagers,
     peopleRelations: state.entities.peopleRelations,
     users: state.entities.users,
+    lms: state.entities.lms,
     appState: state.appState,
     report: state.report
   };

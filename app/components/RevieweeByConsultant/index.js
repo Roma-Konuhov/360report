@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Table from './Table';
 
 class RevieweesByConsultant extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      data: []
-    };
 
     this.propsDbToScreenMap = {
       'username': 'Reviewee',
@@ -16,26 +13,26 @@ class RevieweesByConsultant extends Component {
     this.columns = ['username', 'responders_number'];
   }
 
-  componentWillMount() {
-    this.setState({ data: this.props.revieweesByConsultants });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({ data: nextProps.revieweesByConsultants });
-  }
-
   render() {
     return (
       <div className="container">
         <Table
-          data={this.state.data}
+          data={this.props.data}
           columns={this.columns}
           propsDbToScreenMap={this.propsDbToScreenMap}
-          hoverable
+          cssClasses="table-hover main"
         />
       </div>
     );
   }
 }
 
-export default RevieweesByConsultant;
+const mapStateToProps = (state) => {
+  return {
+    data: state.entities.revieweesByConsultants
+  }
+};
+
+export default connect(
+  mapStateToProps
+)(RevieweesByConsultant);

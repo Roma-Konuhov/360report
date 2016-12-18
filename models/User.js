@@ -6,10 +6,13 @@ var userSchema = require('../db/schema').userSchema;
 var logger = require('../lib/logger')(module);
 var validator = require('../lib/validator');
 var validRule = require('joi');
+var isEmpty = require('lodash/isEmpty');
 
 var CSV_TO_DB_MAP = {
-  'name': 'name',
-  'email': 'email'
+  'Name': 'name',
+  'Email': 'email',
+  'LM': 'lm_name',
+  'Email of LM': 'lm_email',
 };
 var EMAIL_DOMAIN = 'cogniance.com';
 
@@ -17,7 +20,9 @@ var collectionName = 'users';
 
 var validationRules = {
   'name': validRule.string().required(),
-  'email': validRule.string().required()
+  'email': validRule.string().required(),
+  'lm_name': validRule.string().required(),
+  'lm_email': validRule.string().required(),
 };
 
 userSchema.methods.comparePassword = function(password, cb) {
@@ -63,6 +68,10 @@ userSchema.statics.parse = function(filename, cb) {
 userSchema.statics.saveCollection = function(data, cb) {
   var collection = [];
 
+  if (isEmpty(data)) {
+    cb('Data are corrupted')
+  }
+
   data.forEach(function(row, idx) {
     var user = new User(row);
     user.save(function(err, instance) {
@@ -75,6 +84,36 @@ userSchema.statics.saveCollection = function(data, cb) {
         cb(null, collection);
       }
     });
+  });
+};
+
+userSchema.statics.getLMList = function(cb) {
+  logger.info('Query to get list of all LMs');
+  User.aggregate([
+    { '$lookup': {
+      from: 'users',
+      localField: 'lm_email',
+      foreignField: 'email',
+      as: 'data'
+    }},
+    { '$unwind': '$data' },
+    { '$group': {
+      _id: '$lm_email',
+      name: { $first: '$lm_name' },
+      email: { $first: '$lm_email' },
+      data: { $first: '$data'},
+      subordinate_number: { $sum: 1 },
+      subordinate_ids: { $push: '$_id' },
+      subordinate_names: { $push: '$name' }}
+    },
+    { $sort: { _id: 1 }}
+  ], function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err);
+    }
+    logger.info('List of all LMs was retrieved successfully %j', data);
+    cb(null, data);
   });
 };
 

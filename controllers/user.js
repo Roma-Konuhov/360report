@@ -25,4 +25,14 @@ exports.usersGet = function(req, res, next) {
   });
 };
 
+exports.lmsGet = function(req, res) {
+  logger.info('request list of LMs grouped by users');
+
+  User.getLMList(function(err, lms) {
+    if (err) {
+      return next(new HttpError(400, err.message));
+    }
+    res.json(lms);
+  });
+}
 

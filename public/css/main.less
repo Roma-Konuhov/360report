@@ -52,6 +52,10 @@ h2 {
   position: relative;
 }
 
+.navbar {
+  margin: 0;
+}
+
 .navbar-default .navbar-nav > li > a {
   border-bottom: 3px solid transparent;
   padding-bottom: (@navbar-padding-vertical - 3);
@@ -192,10 +196,41 @@ h2 {
 }
 
 .data-table {
-  tbody tr {
-    &:hover {
-      cursor: pointer;
+  &.table-hover {
+    tbody tr {
+      &:hover {
+        cursor: pointer;
+      }
     }
+  }
+  &.lms {
+    .details {
+      background: #ecf4ff;
+      .subordinate {
+        width: 100%;
+        margin: 5px 0;
+        overflow: hidden;
+        .name {
+          vertical-align: middle;
+        }
+        .export-buttons-wrapper {
+          float: right;
+          .export-buttons {
+            display: inline;
+            .btn {
+              font-size: 10px;
+            }
+          }
+        }
+      }
+      &:hover {
+        cursor: default;
+        background: #ecf4ff;
+      }
+    }
+  }
+  &.main {
+    margin-top: 25px;
   }
 }
 
@@ -392,6 +427,24 @@ h2 {
         -moz-animation-delay: 5s;
         animation-delay: 5s;
       }
+    }
+  }
+}
+
+.export-panel {
+  border-bottom: 1px solid #e7e7e7;
+  padding: 15px 0;
+  text-align: right;
+}
+
+.export-buttons {
+  .btn {
+    background: transparent;
+    border: 1px solid #aaa;
+    margin-left: 15px;
+
+    &:hover {
+      background: #f8f8f8;
     }
   }
 }

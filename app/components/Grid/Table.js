@@ -39,8 +39,8 @@ class Table extends Component {
 
   render() {
     let styles = 'data-table table';
-    if (this.props.hoverable) {
-      styles += ' table-hover';
+    if (this.props.cssClasses) {
+      styles += ` ${this.props.cssClasses}`;
     }
 
     return (
@@ -56,11 +56,7 @@ Table.propTypes = {
   data: React.PropTypes.array,
   columns: React.PropTypes.array,
   propsDbToScreenMap: React.PropTypes.object,
-  hoverable: React.PropTypes.bool
-};
-
-Table.defaultProps = {
-  hoverable: false
+  cssClasses: React.PropTypes.string
 };
 
 export default Table;

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Report from './Report';
 import { fetchReportStatistics, fetchReportAnswers, fetchReportUser } from '../actions/report';
+import ExportPanel from './ExportPanel';
 
 class ConsultantReport extends React.Component {
   componentDidMount() {
@@ -13,11 +14,14 @@ class ConsultantReport extends React.Component {
 
   render() {
     return (
-      <Report
-        user={this.props.user}
-        reports={this.props.reports}
-        statistics={this.props.statistics}
-      />
+      <div className="container">
+        <ExportPanel entityType="consultant" id={this.props.params.id} />
+        <Report
+          user={this.props.user}
+          reports={this.props.reports}
+          statistics={this.props.statistics}
+        />
+      </div>
     );
   }
 }

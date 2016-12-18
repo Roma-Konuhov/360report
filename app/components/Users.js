@@ -12,8 +12,10 @@ class Users extends Component {
     this.propsDbToScreenMap = {
       'name': 'Name',
       'email': 'Email',
+      'lm_name': 'LM Name',
+      'lm_email': 'LM Email',
     };
-    this.columns = ['name', 'email'];
+    this.columns = ['name', 'email', 'lm_name', 'lm_email'];
   }
 
   componentWillMount() {
@@ -31,7 +33,7 @@ class Users extends Component {
           data={this.state.data}
           columns={this.columns}
           propsDbToScreenMap={this.propsDbToScreenMap}
-          hoverable
+          cssClasses="main"
         />
       </div>
     );

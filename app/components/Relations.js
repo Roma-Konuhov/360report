@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Table from './Grid/Table';
 
 class Relations extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      data: []
-    };
 
     this.propsDbToScreenMap = {
       'responder': 'Responder',
@@ -19,26 +16,26 @@ class Relations extends Component {
     this.columns = ['responder', 'responderEmail', 'reviewee', 'revieweeEmail', 'relation'];
   }
 
-  componentWillMount() {
-    this.setState({ data: this.props.peopleRelations });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({ data: nextProps.peopleRelations });
-  }
-
   render() {
     return (
       <div className="container">
         <Table
-          data={this.state.data}
+          data={this.props.data}
           columns={this.columns}
           propsDbToScreenMap={this.propsDbToScreenMap}
-          hoverable
+          cssClasses="main"
         />
       </div>
     );
   }
 }
 
-export default Relations;
+const mapStateToProps = (state) => {
+  return {
+    data: state.entities.peopleRelations
+  }
+};
+
+export default connect(
+  mapStateToProps
+)(Relations);
