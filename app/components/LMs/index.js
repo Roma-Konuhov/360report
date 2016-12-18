@@ -11,7 +11,7 @@ class LMs extends Component {
     this.propsDbToScreenMap = {
       'name': 'Name',
       'email': 'Email',
-      'subordinate_number': 'Subordinates number',
+      'subordinate_number': 'Subordinates',
     };
     this.columns = ['name', 'email', 'subordinate_number'];
   }

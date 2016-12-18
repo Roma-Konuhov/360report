@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { BaseRow } from '../Grid/Row';
 import Cell from '../Grid/Cell';
 import { toggleRowSelection } from '../../actions/appState';
+import ExportButtonsBulk from '../ExportButtonsBulk';
 
 class Row extends BaseRow {
   onRowClick(row, e) {
@@ -22,6 +23,8 @@ class Row extends BaseRow {
         {columns.map((col, idx) => {
           return (<Cell key={'cell-' + idx} className={col} value={row[col]} />);
         })}
+        <td><ExportButtonsBulk id={row.data._id} entityType="consultant"/></td>
+        <td><ExportButtonsBulk id={row.data._id} entityType="manager"/></td>
       </tr>
     );
   }

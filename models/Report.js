@@ -481,7 +481,7 @@ module.exports = {
   },
 
   /**
-   * Returns average answers for a specific person
+   * Returns average value for each question based on answers of responders of the specific person
    * [
    *   { _id: 1,
    *     self_score1: <float>,
@@ -513,9 +513,9 @@ module.exports = {
   },
 
   /**
-   * Returns average answers of all people in the company
+   * Returns average value for each question based on answers of all people in the company
    * [
-   *   { _id: 1,
+   *   { _id: null,
    *     avg_norm2: <float>,
    *     avg_norm2: <float>,
    *     ...

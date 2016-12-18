@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
-  exportReportToPdf,
-  exportReportToPng,
+  exportReportBulkToPdf,
+  exportReportBulkToPng,
 } from '../actions/reportExport';
 
 
@@ -24,8 +24,8 @@ class ExportButtons extends React.Component {
   render() {
     return (
       <div className="export-buttons">
-        <button className="btn btn-secondary" onClick={this.exportToPdf.bind(this)}>Export PDF</button>
-        <button className="btn btn-secondary" onClick={this.exportToPng.bind(this)}>Export PNG</button>
+        <button className="btn btn-secondary" onClick={this.exportToPdf.bind(this)}>Export bulk PDF</button>
+        <button className="btn btn-secondary" onClick={this.exportToPng.bind(this)}>Export bulk PNG</button>
       </div>
     );
   }
@@ -37,8 +37,8 @@ ExportButtons.propTypes = {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  exportToPdf: (entityType, id) => dispatch(exportReportToPdf(entityType, id)),
-  exportToPng: (entityType, id) => dispatch(exportReportToPng(entityType, id))
+  exportToPdf: (entityType, id) => dispatch(exportReportBulkToPdf(entityType, id)),
+  exportToPng: (entityType, id) => dispatch(exportReportBulkToPng(entityType, id))
 });
 
 export default connect(null,

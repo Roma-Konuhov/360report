@@ -16,11 +16,11 @@ var routes = require('../app/routes');
 var EXPORT_DIR = os.tmpdir();
 
 exports.exportFile = function(req, res, reportConfig, cb) {
-  var id = req.params.id;
-  var exportFormat = req.params.format;
-  var htmlFilepath = './public/export.html';
+  var revieweeId = reportConfig.user._id;
+  var exportFormat = reportConfig.format;
+  var htmlFilepath = './public/' + (+new Date()) + '.html';
 
-  logger.info('Exporting of the report to format %s for user with ID %s', exportFormat, id);
+  logger.info('Exporting of the report to format %s for user with ID %s', exportFormat, revieweeId);
 
   var store = configureStore({
     report: {
@@ -33,7 +33,7 @@ exports.exportFile = function(req, res, reportConfig, cb) {
   var uri = [
     reportConfig.uriPrefix,
     'report',
-    req.params.id
+    revieweeId
   ].join('/');
   uri = '/' + uri;
 
@@ -51,10 +51,16 @@ exports.exportFile = function(req, res, reportConfig, cb) {
       }, function(err, page) {
         fs.writeFile(htmlFilepath, page, function(err) {
           if (err) {
+            fs.unlink(htmlFilepath);
             return cb(err);
           } else {
             Export.exportFile(htmlFilepath, EXPORT_DIR, exportFormat, function(err, result) {
               logger.info('HTML file was saved to "%s"', result.filepath);
+              fs.unlink(htmlFilepath, function(err) {
+                if (err) {
+                  logger.error(err);
+                }
+              });
               return cb(null, {filename: result.filename, message: 'File was exported successfully', status: 'ok'});
             });
           }

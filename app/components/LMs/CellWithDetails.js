@@ -4,9 +4,10 @@ import ExportButtons from '../ExportButtons';
 class CellWithDetails extends Component {
   render() {
     const { columns, row, className } = this.props;
+    const numberOfFixedColumns = 2;
 
     return (
-      <td className={className || ''} colSpan={'' + columns.length}>
+      <td className={className || ''} colSpan={columns.length + numberOfFixedColumns}>
         <div className="subordinates">
           {row.subordinate_names.map((name, idx) =>
             <div className="subordinate" key={`subordinate-${idx}`}>

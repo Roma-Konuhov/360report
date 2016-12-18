@@ -87,6 +87,31 @@ userSchema.statics.saveCollection = function(data, cb) {
   });
 };
 
+/**
+ * Returns list of LMs and their subordinates in format:
+ * [
+ *   {
+ *     _id: rperimov@cogniance.com,
+ *     email: rperimov@cogniance.com,
+ *     name: 'Roman Perimov',
+ *     subordinate_number: 5,
+ *     subordinate_names: [list of names],
+ *     subordinate_ids: [list of ids],
+ *     data: {   // LM's data from the same table "users"
+ *       _id: 585687c241329e3cd87ba7e3,
+ *       email: rperimov@cogniance.com,
+ *       name: 'Roman Perimov',
+ *       lm_email: 'mshraybman@cogniance.com'
+ *       lm_name: 'Roman Perimov',
+ *       updatedAt: "2016-12-18T12:57:38.887Z"
+ *       createdAt: "2016-12-18T12:57:38.887Z"
+ *     },
+ *   },
+ *   ...
+ * ]
+ *
+ * @param cb
+ */
 userSchema.statics.getLMList = function(cb) {
   logger.info('Query to get list of all LMs');
   User.aggregate([
@@ -114,6 +139,27 @@ userSchema.statics.getLMList = function(cb) {
     }
     logger.info('List of all LMs was retrieved successfully %j', data);
     cb(null, data);
+  });
+};
+
+/**
+ * Returns list of subordinates for LM with ID = lmId
+ *
+ * @param {int} lmId
+ */
+userSchema.statics.getSubordinatesFor = function(lmId, cb) {
+  logger.info('Query to get all subordinates for LM with ID "%s"', lmId);
+  User.aggregate([
+    { '$match': { _id: mongoose.Types.ObjectId(lmId) }},
+    { '$lookup': { from: 'users', localField: 'name', foreignField: 'lm_name', as: 'subordinates' }},
+  ], function(err, result) {
+    if (err) {
+      logger.error(err);
+      return cb(err);
+    }
+    const subordinates = result[0] && result[0].subordinates || [];
+    logger.info('Query was completed successfully: %j', subordinates);
+    cb(null, subordinates);
   });
 };
 

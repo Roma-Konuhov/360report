@@ -401,7 +401,7 @@ consultantReportSchema.statics.regroupBySeries = function(reports, cb) {
       qObject['respondersNumber'] = Object.values(qObject['respondersNumber']);
       result.push(qObject);
     });
-    logger.info('The regrouping by series is finished successfully');
+    logger.info('The regrouping by series is finished successfully %j', result);
     cb(null, result);
   });
 };

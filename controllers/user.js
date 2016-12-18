@@ -34,5 +34,5 @@ exports.lmsGet = function(req, res) {
     }
     res.json(lms);
   });
-}
+};
 

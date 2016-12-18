@@ -5,6 +5,7 @@ var config = {
   devtool: 'inline-source-map',
   entry: [
     'webpack-hot-middleware/client?path=http://localhost:3000/__webpack_hmr',
+    'babel-polyfill',
     './app/main'
   ],
   output: {

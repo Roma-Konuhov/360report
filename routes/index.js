@@ -47,9 +47,11 @@ module.exports = function(app) {
   app.get('/consultant/report/:id', consultantController.reportGet);
   app.get('/consultant/statistics/:id', consultantController.statisticsGet);
   app.post('/consultant/export/:format/:id', consultantController.exportFilePost);
+  app.post('/consultant/export/bulk/:format/:id', consultantController.exportBulkPost);
 
   app.get('/reviewees-by-managers', managerController.revieweesGet);
   app.get('/manager/report/:id', managerController.reportGet);
   app.get('/manager/statistics/:id', managerController.statisticsGet);
   app.post('/manager/export/:format/:id', managerController.exportFilePost);
+  //app.post('/manager/export/bulk/:format/:id', managerController.exportBulkPost);
 };
