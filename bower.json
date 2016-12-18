@@ -15,6 +15,8 @@
   ],
   "dependencies": {
     "bootstrap-filestyle": "^1.2.1",
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "highcharts": "^5.0.6",
+    "lodash": "^4.17.2"
   }
 }

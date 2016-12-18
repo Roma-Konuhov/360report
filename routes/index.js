@@ -53,5 +53,5 @@ module.exports = function(app) {
   app.get('/manager/report/:id', managerController.reportGet);
   app.get('/manager/statistics/:id', managerController.statisticsGet);
   app.post('/manager/export/:format/:id', managerController.exportFilePost);
-  //app.post('/manager/export/bulk/:format/:id', managerController.exportBulkPost);
+  app.post('/manager/export/bulk/:format/:id', managerController.exportBulkPost);
 };

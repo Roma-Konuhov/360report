@@ -86,3 +86,72 @@ exports.exportFilePost = function(req, res, next) {
     });
   });
 };
+
+
+/**
+ * Export reports for all subordinators of the specified LM
+ * LM is specified by id
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.exportBulkPost = function(req, res, next) {
+  var lmId = req.params.id;
+  var ExportController = require('./export');
+  var errors = [];
+  var responses = [];
+  var processCounter = 0;
+
+  User.getSubordinatesFor(lmId, function(err, subordinates) {
+    _.each(subordinates, (subordinate) => {
+      var subordinateId = subordinate._id;
+      var getReportAnswers = function(id, cb) {
+        async.waterfall([
+          ManagerReport.getReport.bind(ManagerReport, id),
+          ManagerReport.regroupBySeries.bind(ManagerReport),
+        ], cb);
+      };
+
+      async.parallel({
+        answers: getReportAnswers.bind(ManagerReport, subordinateId),
+        statistics: ManagerReport.getStatistics.bind(ManagerReport, subordinateId),
+        user: User.findById.bind(User, subordinateId),
+      }, function(err, reportConfig) {
+        logger.info("report config: %j", reportConfig);
+        if (err) {
+          logger.error(err);
+          errors.push(err.message);
+        }
+
+        reportConfig['uriPrefix'] = 'manager';
+        reportConfig['format'] = req.params.format;
+
+        ExportController.exportFile(req, res, reportConfig, function(err, response) {
+          if (err) {
+            return next(new HttpError(400, err.message));
+          }
+
+          responses.push(response);
+          processCounter++;
+          logger.info('Processed files: %d from %d', processCounter, subordinates.length);
+          if (processCounter === subordinates.length) {
+            if (errors.length) {
+              logger.error('The following errors occur: %j', errors);
+              return next(new HttpError(400, errors));
+            }
+            logger.info('Files were exported successfully');
+            let result = { message: 'Files were exported successfully', filenames: [] };
+            responses.forEach((response) => {
+              result.filenames.push(response.filename);
+            });
+            res.json(result);
+          }
+        });
+      });
+    });
+    if (!subordinates) {
+      res.json({ message: 'There are no any subordinates assigned to specified LM'});
+    }
+  });
+};
