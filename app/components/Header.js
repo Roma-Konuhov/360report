@@ -3,7 +3,7 @@ import { IndexLink, Link } from 'react-router';
 import { connect } from 'react-redux';
 import Display from './Display';
 import Messages from './Messages';
-
+import Spinner from './Spinner';
 
 class Header extends React.Component {
   render() {
@@ -11,6 +11,9 @@ class Header extends React.Component {
 
     return (
       <nav className="navbar navbar-default navbar-static-top">
+        <Display if={this.props.httpRequestCounter}>
+          <Spinner />
+        </Display>
         <div className="container">
           <Messages messages={this.props.messages}/>
           <Display if={this.props.error} nowrap="true">
@@ -47,7 +50,8 @@ const mapStateToProps = (state) => {
   return {
     token: state.auth.token,
     user: state.auth.user,
-    messages: state.messages
+    messages: state.messages,
+    httpRequestCounter: state.http.requestCounter,
   };
 };
 

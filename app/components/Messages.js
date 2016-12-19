@@ -39,21 +39,21 @@ class Messages extends React.Component {
             return (
               <div role="alert" className="alert alert-success">
                 <div className="close" onClick={this.handleClose.bind(this, 'success')}></div>
-                {messages.map((message, index) => <div key={index}>{message}</div>)}
+                {messages.map((message, index) => <div key={`success-${index}`}>{message}</div>)}
               </div>
             );
           case 'error':
             return (
               <div role="alert" className="alert alert-danger">
                 <div className="close" onClick={this.handleClose.bind(this, 'error')}></div>
-                {messages.map((message, index) => <div key={index}>{message}</div>)}
+                {messages.map((message, index) => <div key={`error-${index}`}>{message}</div>)}
               </div>
             );
           case 'info':
             return (
               <div role="alert" className="alert alert-info">
                 <div className="close" onClick={this.handleClose.bind(this, 'info')}></div>
-                {messages.map((message, index) => <div key={index}>{message}</div>)}
+                {messages.map((message, index) => <div key={`alert-${index}`}>{message}</div>)}
               </div>
             );
           default:
