@@ -16,7 +16,7 @@ exports.userGet = function(req, res, next) {
 
 exports.usersGet = function(req, res, next) {
   logger.info('request list of all users and their emails');
-  User.find(function(err, users) {
+  User.find({}, null, { sort: { name: 1 } }, function(err, users) {
     if (err) {
       return next(new HttpError(400, err.message));
     }

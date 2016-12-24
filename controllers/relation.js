@@ -15,7 +15,7 @@ var mapRelationDbToScreen = function(data) {
 };
 
 exports.revieweesGet = function(req, res) {
-  return Relation.find({}, function(err, data) {
+  return Relation.find({}, null, { sort: { responder: 1 } }, function(err, data) {
     if (err) {
       logger.error(err);
       return next(new HttpError(400, err.message));

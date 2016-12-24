@@ -191,7 +191,8 @@ consultantReportSchema.statics.getReviewees = function(cb) {
 
   return this.aggregate([
     { $group: { _id: "$reviewee", responders_number: { $sum: 1 } }},
-    { $project: { username: "$_id", responders_number: "$responders_number" } }
+    { $project: { username: "$_id", responders_number: "$responders_number" } },
+    {$sort: { username: 1 }},
   ], function(err, data) {
     if (err) {
       logger.error(err);
