@@ -24,8 +24,9 @@ exports.exportFile = function(req, res, reportConfig, cb) {
   logger.info('Exporting of the report to format %s for user with ID %s', exportFormat, revieweeId);
 
   if (isReportEmpty(reportConfig.answers)) {
-    logger.info('Report for %s made by %s is empty and won\'t be processed', reportConfig.user.name, reportConfig.uriPrefix);
-    return cb(null, { message: 'Report is empty', status: 'empty' });
+    const message = `Report for ${reportConfig.uriPrefix} ${reportConfig.user.name} is empty`;
+    logger.info(message);
+    return cb(null, { message: message, status: 'empty' });
   }
 
   var store = configureStore({
@@ -67,7 +68,7 @@ exports.exportFile = function(req, res, reportConfig, cb) {
                   logger.error(err);
                 }
               });
-              return cb(null, {filename: result.filename, message: 'File was exported successfully', status: 'ok'});
+              return cb(null, {filename: result.filename, message: `Report for ${reportConfig.uriPrefix} ${reportConfig.user.name} was exported successfully`, status: 'ok'});
             });
           }
         });
@@ -95,7 +96,7 @@ exports.exportGet = function(req, res, next) {
 };
 
 /**
- * The method passes through parameter "answers" of the passed argument.
+ * The method passes through property "answers" of the passed argument.
  * If all answers contain 0 then such report is considered as empty
  *
  * @param {Array}
