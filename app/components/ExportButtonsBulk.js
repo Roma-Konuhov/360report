@@ -11,7 +11,8 @@ class ExportButtons extends React.Component {
     e.preventDefault();
     e.stopPropagation();
     const { entityType, id } = this.props;
-    this.props.exportToPdf(entityType, id);
+    this.props.exportToPdf('consultant', id);
+    this.props.exportToPdf('manager', id);
   }
 
   exportToPng(e) {

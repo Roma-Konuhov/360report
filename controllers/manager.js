@@ -142,10 +142,16 @@ exports.exportBulkPost = function(req, res, next) {
               return next(new HttpError(400, errors));
             }
             logger.info('Files were exported successfully');
-            let result = { message: 'Files were exported successfully', filenames: [] };
+            let result = { message: [], filenames: [] };
             responses.forEach((response) => {
-              result.filenames.push(response.filename);
+              if (response.status === 'ok') {
+                result.filenames.push(response.filename);
+                result.message.push(response.message);
+              }
             });
+            if  (!result.message.length) {
+              result.message = 'Reports for all managers are empty';
+            }
             res.json(result);
           }
         });

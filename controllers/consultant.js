@@ -148,9 +148,12 @@ exports.exportBulkPost = function(req, res, next) {
             responses.forEach((response) => {
               if (response.status === 'ok') {
                 result.filenames.push(response.filename);
+                result.message.push(response.message);
               }
-              result.message.push(response.message);
             });
+            if  (!result.message.length) {
+              result.message = 'Reports for all consultants are empty';
+            }
             res.json(result);
           }
         });

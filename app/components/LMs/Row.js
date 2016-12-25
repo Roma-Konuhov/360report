@@ -20,7 +20,7 @@ class Row extends BaseRow {
         {columns.map((col, idx) => {
           return (<Cell key={'cell-' + idx} className={col} value={row[col]} />);
         })}
-        <td><ExportButtonsBulk id={row.data._id} entityType="consultant"/></td>
+        <td><ExportButtonsBulk id={row.data._id} entityType=""/></td>
       </tr>
     );
   }
