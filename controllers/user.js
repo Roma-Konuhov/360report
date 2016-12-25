@@ -73,7 +73,7 @@ exports.emailRevieweeReportPost = function(req, res, next) {
         html += `<p>Below you can find reports for ${consultantReport.username}</p>`;
 
         mailer.send({
-          to: 'rkonuhov@cogniance.com',  // lm.email
+          to: lm.email,
           subject: '360 review reports',
           html: html,
           attachments: attachments
@@ -130,7 +130,7 @@ exports.emailSubordinateReportsPost = function(req, res, next) {
         html += `<p>Below you can find reports for the following employees: <ol>${reviewees}</ol></p>`;
 
         mailer.send({
-          to: 'rkonuhov@cogniance.com',
+          to: lm.email,
           subject: '360 review reports',
           html: html,
           attachments: attachments
