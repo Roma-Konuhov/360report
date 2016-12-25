@@ -14,9 +14,6 @@ class Row extends BaseRow {
   render() {
     const { columns, row } = this.props;
     const classNames = row['active'] ? 'active' : '';
-    if (row.active) {
-      console.log('i am active ROw', row.name)
-    }
 
     return (
       <tr onClick={this.onRowClick.bind(this, row)} className={classNames}>
@@ -24,7 +21,6 @@ class Row extends BaseRow {
           return (<Cell key={'cell-' + idx} className={col} value={row[col]} />);
         })}
         <td><ExportButtonsBulk id={row.data._id} entityType="consultant"/></td>
-        <td><ExportButtonsBulk id={row.data._id} entityType="manager"/></td>
       </tr>
     );
   }

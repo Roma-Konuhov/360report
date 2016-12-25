@@ -23,10 +23,10 @@ class Header extends React.Component {
             <IndexLink to="/" className="logo"></IndexLink>
             <ul className="nav navbar-nav">
               <Display if={this.props.revieweesByConsultants} nowrap="true">
-                <li><Link to="/reviewees-by-consultants" activeStyle={active}>By Constultans</Link></li>
+                <li><Link to="/reviewees-by-consultants" activeStyle={active}>For Constultans</Link></li>
               </Display>
               <Display if={this.props.revieweesByManagers} nowrap="true">
-                <li><Link to="/reviewees-by-managers" activeStyle={active}>By Managers</Link></li>
+                <li><Link to="/reviewees-by-managers" activeStyle={active}>For Managers</Link></li>
               </Display>
               <Display if={this.props.peopleRelations} nowrap="true">
                 <li><Link to="/people-relations" activeStyle={active}>Relations</Link></li>

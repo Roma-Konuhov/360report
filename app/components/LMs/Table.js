@@ -12,8 +12,7 @@ export default class Table extends BaseTable {
         {this.props.columns.map((column, idx) => {
           return (<th key={idx}>{this.props.propsDbToScreenMap[column]}</th>);
         })}
-        <th>All by consultants</th>
-        <th>All by managers</th>
+        <th>Export all reports</th>
       </tr>
       </thead>
     );

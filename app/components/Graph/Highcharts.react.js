@@ -4,18 +4,7 @@ import options from './options';
 import _ from 'lodash';
 
 export default React.createClass({
-  componentWillReceiveProps(nextProps) {
-    if (!this.chart || !nextProps) return;
-
-    // this.chart.series[0].update({
-    //   data: nextProps.data
-    // });
-    // this.chart.redraw();
-    this.chart.series[0].setData(nextProps.data, true);
-  },
-
-  // When the DOM is ready, create the chart.
-  componentDidMount() {
+  setChartOptions() {
     var self = this;
 
     if (this.props.title) {
@@ -35,6 +24,26 @@ export default React.createClass({
     if (!_.isEmpty(this.props.avgValuesOptions)) {
       this.setPlotLinesOptions(this.props.avgValuesOptions);
     }
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.chart || !nextProps) return;
+
+    this.setChartOptions();
+    this.chart.options = options;
+
+    // this.chart.series[0].update({
+    //   data: nextProps.data
+    // });
+    // this.chart.redraw();
+    this.chart.series[0].setData(nextProps.data, true);
+  },
+
+  /**
+   *  When the DOM is ready, create the chart.
+   */
+  componentDidMount() {
+    this.setChartOptions();
     //options.series[0] = this.props.data;
     // Extend Highcharts with modules
     if (this.props.modules) {
@@ -65,7 +74,7 @@ export default React.createClass({
     opts.forEach(opt => {
       result.push(_.defaultsDeep({}, commonOptions, opt));
     });
-    options.yAxis.plotLines = result;
+    options.yAxis.plotLines = _.cloneDeep(result);
   },
 
   //Destroy chart before unmount.

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ExportButtons from '../ExportButtons';
+import ExportPdfButton from '../ExportPdfButton';
 
 class CellWithDetails extends Component {
   render() {
@@ -13,8 +13,14 @@ class CellWithDetails extends Component {
             <div className="subordinate" key={`subordinate-${idx}`}>
               <span className="name">{name}</span>
               <div className="export-buttons-wrapper">
-                <ExportButtons id={row.subordinate_ids[idx]} entityType="consultant"/>
-                <ExportButtons id={row.subordinate_ids[idx]} entityType="manager"/>
+                <span>
+                  <label>Consultant report</label>
+                  <ExportPdfButton id={row.subordinate_ids[idx]} entityType="consultant"/>
+                </span>
+                <span>
+                  <label>Manager report</label>
+                  <ExportPdfButton id={row.subordinate_ids[idx]} entityType="manager"/>
+                </span>
               </div>
             </div>
           )}

@@ -41,6 +41,7 @@ module.exports = function(app) {
   app.get('/user/:id', userController.userGet);
   app.get('/people-relations', relationController.revieweesGet);
   app.get('/export/:filename', exportController.exportGet);
+  //app.post('/export/bulk/:format/:id', exportController.exportBulkPost);
   app.get('/lms', userController.lmsGet);
 
   app.get('/reviewees-by-consultants', consultantController.revieweesGet);

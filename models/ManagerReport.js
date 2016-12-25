@@ -12,7 +12,13 @@ var uniqueBy = require('../helpers/collection').uniqueBy;
 var validator = require('../lib/validator');
 var validRule = require('joi');
 
-var AVG_DECIMAL_PRECISION = 2;
+var AVG_DECIMAL_PRECISION = 1;
+/*
+ * If true then responders which don't have any relation
+ * with reviewee(i.e. db.consultant_report.relation = -1)
+ * will not be taken into account for compiling a report
+ */
+var REPORTS_WITH_ONLY_RELATED_RESPONDERS = true;
 var collectionName = 'manager_reports';
 
 var CSV_TO_DB_MAP = {
@@ -181,11 +187,17 @@ managerReportSchema.statics.saveCollection = function(data, cb) {
 managerReportSchema.statics.getReviewees = function(cb) {
   logger.info('Request for list of all reviewees');
 
-  return this.aggregate([
+  var query = [
     { $group: { _id: "$reviewee", responders_number: { $sum: 1 } }},
     { $project: { username: "$_id", responders_number: "$responders_number" } },
     {$sort: { username: 1 }},
-  ], function(err, data) {
+  ];
+
+  if (REPORTS_WITH_ONLY_RELATED_RESPONDERS) {
+    query.unshift({$match: { 'relation': { $gte: 0 }}})
+  }
+
+  return this.aggregate(query, function(err, data) {
     if (err) {
       logger.error(err);
       return cb(err, null);
@@ -238,12 +250,18 @@ managerReportSchema.statics.getReport = function(userId, cb) {
     groupQuery['$group']['answers' + i] = {$push: {answer: '$q' + i, responder: "$responder"}};
   }
 
-  ManagerReport.aggregate([
+  var query = [
     {$lookup: {from:'users',localField:'reviewee',foreignField:'name',as:'joined_reviewee'}},
     {$match:{'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
     groupQuery,
     {$sort: {'_id.relation': 1}}
-  ], function(err, data) {
+  ];
+
+  if (REPORTS_WITH_ONLY_RELATED_RESPONDERS) {
+    query.unshift({$match: { 'relation': { $gte: 0 }}})
+  }
+
+  ManagerReport.aggregate(query, function(err, data) {
     if (err) {
       logger.error(err);
       return cb(err, null);
@@ -418,8 +436,8 @@ managerReportSchema.statics.regroupBySeries = function(reports, cb) {
 managerReportSchema.statics.getStatistics = function(userId, cb) {
   logger.info('Get statistics for person with ID "%s"', userId);
   async.parallel({
-    selfAvg:  this.getAvgAnswersForReviewee.bind(this, userId),
-    respondersAvg: this.getAvgAnswersByResponders.bind(this, userId),
+    selfAvg:  this.getOwnAnswers.bind(this, userId),
+    respondersAvg: this.getAvgAnswersOfResponders.bind(this, userId),
     companyAvg: this.getAvgAnswersByCompany
   }, function(err, results) {
     if (err) {
@@ -464,7 +482,7 @@ managerReportSchema.statics.getStatistics = function(userId, cb) {
  * @param userId
  * @param {Function} cb
  */
-managerReportSchema.statics.getAvgAnswersByResponders = function(userId, cb) {
+managerReportSchema.statics.getAvgAnswersOfResponders = function(userId, cb) {
   logger.info('Aggregated query to get average answers of all responders for for a person with ID "%s", excluding reviewee', userId);
 
   var groupQuery = {
@@ -475,13 +493,19 @@ managerReportSchema.statics.getAvgAnswersByResponders = function(userId, cb) {
     groupQuery['$group']['avg_score' + i] = {$avg: '$q' + i};
   }
 
-  ManagerReport.aggregate([
+  var query = [
     {$lookup: {from: 'users', localField: 'reviewee', foreignField: 'name', as: 'joined_reviewee'}},
-    {$match: {'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
-    {'$unwind': '$joined_reviewee'},
+    {$match: { 'joined_reviewee._id': mongoose.Types.ObjectId(userId) }},
+    {$unwind: '$joined_reviewee'},
     {$redact: {$cond: [{$ne:['$responder','$joined_reviewee.email']},'$$KEEP','$$PRUNE']}},
     groupQuery
-  ], function(err, data) {
+  ];
+
+  if (REPORTS_WITH_ONLY_RELATED_RESPONDERS) {
+    query.unshift({ $match: { 'relation': { $gte: 0 }}});
+  }
+
+  ManagerReport.aggregate(query, function(err, data) {
     if (err) {
       logger.error(err);
       return cb(err, null);
@@ -492,7 +516,7 @@ managerReportSchema.statics.getAvgAnswersByResponders = function(userId, cb) {
 };
 
 /**
- * Returns average answers for a specific person
+ * Returns own answers
  * [
  *   { _id: 1,
  *     self_score1: <float>,
@@ -505,20 +529,26 @@ managerReportSchema.statics.getAvgAnswersByResponders = function(userId, cb) {
  * @param userId
  * @param {Function} cb
  */
-managerReportSchema.statics.getAvgAnswersForReviewee = function(userId, cb) {
-  logger.info('Aggregated query to get average answers for a person with ID "%s", excluding himself', userId);
+managerReportSchema.statics.getOwnAnswers = function(userId, cb) {
+  logger.info('Aggregated query to get own answers for a person with ID "%s"', userId);
 
-  ManagerReport.aggregate([
+  var query = [
     {$lookup: {from: 'users', localField: 'reviewee', foreignField: 'name', as: 'joined_reviewee'}},
     {$match: {'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
-    {'$unwind': '$joined_reviewee'},
+    {$unwind: '$joined_reviewee'},
     {$redact: {$cond: [{$eq:['$responder','$joined_reviewee.email']},'$$KEEP','$$PRUNE']}}
-  ], function(err, data) {
+  ];
+
+  if (REPORTS_WITH_ONLY_RELATED_RESPONDERS) {
+    query.unshift({ $match: { 'relation': { $gte: 0 }}});
+  }
+
+  ManagerReport.aggregate(query, function(err, data) {
     if (err) {
       logger.error(err);
       return cb(err, null);
     }
-    logger.info('Aggregated query to get average answers for a person, excluding himself, was completed successfully');
+    logger.info('Aggregated query to get own answers for a person with ID "%s", was completed successfully');
     cb(null, data);
   });
 };
@@ -558,6 +588,7 @@ managerReportSchema.statics.getAvgAnswersByCompany = function(cb) {
     cb(null, data);
   });
 };
+
 
 var ManagerReport = mongoose.model('ManagerReport', managerReportSchema);
 

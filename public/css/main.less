@@ -201,6 +201,9 @@ h2 {
 }
 
 .data-table {
+  th, td {
+    white-space: nowrap;
+  }
   &.table-hover {
     tbody tr {
       &:hover {
@@ -209,26 +212,33 @@ h2 {
     }
   }
   &.lms {
-    th:nth-child(1) { width: 22%; }
-    th:nth-child(2) { width: 22%; }
-    th:nth-child(3) { width: 10%; }
+    th:nth-child(1) { width: 35%; }
+    th:nth-child(2) { width: 35%; }
+    th:nth-child(3) { width: 15%; }
     .details {
       background: #ecf4ff;
       .subordinate {
         width: 100%;
-        margin: 5px 0;
+        padding: 7px;
         overflow: hidden;
         .name {
           vertical-align: middle;
         }
         .export-buttons-wrapper {
           float: right;
+          label {
+            font-weight: normal;
+            margin-left: 15px;
+          }
           .export-buttons {
             display: inline;
             .btn {
               margin: 0 0 0 15px;
             }
           }
+        }
+        &:not(:last-child) {
+          border-bottom: 1px solid #ddd;
         }
       }
       &:hover {

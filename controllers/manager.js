@@ -77,6 +77,7 @@ exports.exportFilePost = function(req, res, next) {
     }
 
     reportConfig['uriPrefix'] = 'manager';
+    reportConfig['format'] = req.params.format;
 
     ExportController.exportFile(req, res, reportConfig, function(err, response) {
       if (err) {

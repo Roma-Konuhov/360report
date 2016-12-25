@@ -25,7 +25,9 @@ export function exportReportToPdf(entityType, id) {
       if (response.ok) {
         return response.json().then((json) => {
           dispatch(success(json.message));
-          window.location = '/export/' + json.filename;
+          if (json.filename.trim().length) {
+            window.location = '/export/' + json.filename;
+          }
         });
       } else {
         return response.json().then((json) => {
@@ -48,7 +50,9 @@ export function exportReportToPng(entityType, id) {
       if (response.ok) {
         return response.json().then((json) => {
           dispatch(success(json.message));
-          window.location = '/export/' + json.filename;
+          if (json.filename.trim().length) {
+            window.location = '/export/' + json.filename;
+          }
         });
       } else {
         return response.json().then((json) => {
