@@ -43,6 +43,8 @@ module.exports = function(app) {
   app.get('/export/:filename', exportController.exportGet);
   //app.post('/export/bulk/:format/:id', exportController.exportBulkPost);
   app.get('/lms', userController.lmsGet);
+  app.post('/email-to-lm/subordinates/:lmId', userController.emailSubordinateReportsPost);
+  app.post('/email-to-lm/reviewee/:revieweeId', userController.emailRevieweeReportPost);
 
   app.get('/reviewees-by-consultants', consultantController.revieweesGet);
   app.get('/consultant/report/:id', consultantController.reportGet);

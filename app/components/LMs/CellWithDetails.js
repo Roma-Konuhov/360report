@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ExportPdfButton from '../ExportPdfButton';
+import EmailButton from '../EmailButton';
 
 class CellWithDetails extends Component {
   render() {
@@ -15,11 +16,15 @@ class CellWithDetails extends Component {
               <div className="export-buttons-wrapper">
                 <span>
                   <label>Consultant report</label>
-                  <ExportPdfButton id={row.subordinate_ids[idx]} entityType="consultant"/>
+                  <ExportPdfButton id={row.subordinate_ids[idx]} entityType="consultant" />
                 </span>
                 <span>
                   <label>Manager report</label>
-                  <ExportPdfButton id={row.subordinate_ids[idx]} entityType="manager"/>
+                  <ExportPdfButton id={row.subordinate_ids[idx]} entityType="manager" />
+                </span>
+                <span>
+                  <label>Send report by email</label>
+                  <EmailButton id={row.subordinate_ids[idx]} />
                 </span>
               </div>
             </div>

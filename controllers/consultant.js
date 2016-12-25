@@ -56,9 +56,34 @@ exports.statisticsGet = function(req, res, next) {
   });
 };
 
-
+/**
+ * Action to export report to file (PDF or PNG)
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
 exports.exportFilePost = function(req, res, next) {
   var id = req.params.id;
+  var format = req.params.format;
+
+  exportFile(id, format, res, function(err, response) {
+    if (err) {
+      return next(new HttpError(400, err.message));
+    }
+    res.json(response);
+  });
+};
+
+/**
+ * Exports report to file (PDF or PNG)
+ *
+ * @param {Number} id reviewee ID
+ * @param {String} format (pdf|png)
+ * @param {Object} res
+ * @param {Function} cb
+ */
+var exportFile = function(id, format, res, cb) {
   var ExportController = require('./export');
 
   var getReportAnswers = function(id, cb) {
@@ -75,24 +100,21 @@ exports.exportFilePost = function(req, res, next) {
   }, function(err, reportConfig) {
     logger.info("report config: %j", reportConfig);
     if (err) {
-      logger.error(err);
-      return next(new HttpError(400, err.message));
+      logger.error(err.message);
+      return cb(err);
     }
 
     reportConfig['uriPrefix'] = 'consultant';
-    reportConfig['format'] = req.params.format;
+    reportConfig['format'] = format;
 
-    ExportController.exportFile(req, res, reportConfig, function(err, response) {
-      if (err) {
-        return next(new HttpError(400, err.message));
-      }
-      res.json(response);
-    });
+    ExportController.exportFile(res, reportConfig, cb);
   });
 };
 
+exports.exportFile = exportFile;
+
 /**
- * Export reports for all subordinators of the specified LM
+ * Action to export reports for all subordinators of the specified LM
  * LM is specified by id
  *
  * @param req
@@ -101,6 +123,26 @@ exports.exportFilePost = function(req, res, next) {
  */
 exports.exportBulkPost = function(req, res, next) {
   var lmId = req.params.id;
+  var format = req.params.format;
+
+  exportBulk(lmId, format, res, function(err, result) {
+    if (err) {
+      return next(new HttpError(400, err.message))
+    }
+    res.json(result);
+  });
+};
+
+/**
+ * Export reports for all subordinators of the specified LM
+ * LM is specified by id
+ *
+ * @param lmId
+ * @param format
+ * @param res
+ * @param cb
+ */
+var exportBulk = function(lmId, format, res, cb) {
   var ExportController = require('./export');
   var errors = [];
   var responses = [];
@@ -128,20 +170,20 @@ exports.exportBulkPost = function(req, res, next) {
         }
 
         reportConfig['uriPrefix'] = 'consultant';
-        reportConfig['format'] = req.params.format;
+        reportConfig['format'] = format;
 
-        ExportController.exportFile(req, res, reportConfig, function(err, response) {
+        ExportController.exportFile(res, reportConfig, function(err, response) {
           if (err) {
-            return next(new HttpError(400, err.message));
+            logger.error(err);
+            errors.push(err.message);
           }
-
           responses.push(response);
           processCounter++;
           logger.info('Processed files: %d from %d', processCounter, subordinates.length);
           if (processCounter === subordinates.length) {
             if (errors.length) {
-              logger.error('The following errors occur: %j', errors);
-              return next(new HttpError(400, errors));
+              logger.error('The following errors occurred: %j', errors);
+              return cb({ message: errors });
             }
             logger.info('Files were exported successfully');
             let result = { message: [], filenames: [] };
@@ -151,16 +193,18 @@ exports.exportBulkPost = function(req, res, next) {
                 result.message.push(response.message);
               }
             });
-            if  (!result.message.length) {
+            if (!result.message.length) {
               result.message = 'Reports for all consultants are empty';
             }
-            res.json(result);
+            return cb(null, result, responses);
           }
         });
       });
     });
     if (!subordinates) {
-      res.json({ message: 'There are no any subordinates assigned to specified LM'});
+      return cb({ message: 'There are no any subordinates assigned to specified LM' });
     }
   });
 };
+
+exports.exportBulk = exportBulk;

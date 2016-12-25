@@ -122,6 +122,7 @@ userSchema.statics.getLMList = function(cb) {
       as: 'data'
     }},
     { '$unwind': '$data' },
+    { $sort: { 'name': 1 }},
     { '$group': {
       _id: '$lm_email',
       name: { $first: '$lm_name' },
@@ -145,7 +146,7 @@ userSchema.statics.getLMList = function(cb) {
 /**
  * Returns list of subordinates for LM with ID = lmId
  *
- * @param {int} lmId
+ * @param {String} lmId
  */
 userSchema.statics.getSubordinatesFor = function(lmId, cb) {
   logger.info('Query to get all subordinates for LM with ID "%s"', lmId);
@@ -163,6 +164,28 @@ userSchema.statics.getSubordinatesFor = function(lmId, cb) {
   });
 };
 
+/**
+ * Returns LM's data for reviewee with ID = revieweeId
+ *
+ * @param {String} revieweeId
+ * @param cb
+ */
+userSchema.statics.getLMForReviewee = function(revieweeId, cb) {
+  logger.info('Query to get LM for reviewee with ID "%s"', revieweeId);
+
+  User.aggregate([
+    { $match: { _id: mongoose.Types.ObjectId(revieweeId) }},
+    { $lookup: { from: 'users', localField: 'lm_email', foreignField: 'email', as: 'lm' }},
+  ], function(err, result) {
+    if (err) {
+      logger.error(err);
+      return cb(err);
+    }
+    const lm = result[0] && result[0].lm[0] || {};
+    logger.info('LM for "%s" was fetched successfully: %j', revieweeId, lm);
+    cb(null, lm);
+  });
+};
 
 var User = mongoose.model('User', userSchema);
 

@@ -1,10 +1,10 @@
-var logger = require('../lib/logger')(module);
+var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var os = require('os');
+var logger = require('../lib/logger')(module);
 var HttpError = require('../lib/error').HttpError;
 var Export = require('../models/Export');
-var _ = require('lodash');
 
 var ReactDOM = require('react-dom/server');
 var React = require('react');
@@ -16,7 +16,7 @@ var routes = require('../app/routes');
 
 var EXPORT_DIR = os.tmpdir();
 
-exports.exportFile = function(req, res, reportConfig, cb) {
+exports.exportFile = function(res, reportConfig, cb) {
   var revieweeId = reportConfig.user._id;
   var exportFormat = reportConfig.format;
   var htmlFilepath = './public/' + (+new Date()) + '.html';
@@ -26,7 +26,7 @@ exports.exportFile = function(req, res, reportConfig, cb) {
   if (isReportEmpty(reportConfig.answers)) {
     const message = `Report for ${reportConfig.uriPrefix} ${reportConfig.user.name} is empty`;
     logger.info(message);
-    return cb(null, { message: message, status: 'empty' });
+    return cb(null, { status: 'empty', message: message });
   }
 
   var store = configureStore({
@@ -68,18 +68,33 @@ exports.exportFile = function(req, res, reportConfig, cb) {
                   logger.error(err);
                 }
               });
-              return cb(null, {filename: result.filename, message: `Report for ${reportConfig.uriPrefix} ${reportConfig.user.name} was exported successfully`, status: 'ok'});
+              var message = {
+                status: 'ok',
+                filename: result.filename,
+                filepath: result.filepath,
+                username: reportConfig.user.name,
+                message: `Report for ${reportConfig.uriPrefix} ${reportConfig.user.name} was exported successfully`,
+              };
+              return cb(null, message);
             });
           }
         });
       });
     } else {
       logger.error('Document not found or renderProps are incorrect');
-      return cb({message: 'Document not found or renderProps are incorrect', status: 'fail'})
+      return cb({status: 'fail', message: 'Document not found or renderProps are incorrect'})
     }
   });
 };
 
+/**
+ * Adds headers to download file on the client
+ *
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
 exports.exportGet = function(req, res, next) {
   logger.info('Requested filename to download on the client machine "%s"', req.params.filename);
   var filepath = EXPORT_DIR + '/' + req.params.filename;

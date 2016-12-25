@@ -1,5 +1,7 @@
-import React from 'react';
+import
+  React from 'react';
 import ExportButtons from './ExportButtons';
+import EmailButton from './EmailButton';
 
 
 class ExportPanel extends React.Component {
@@ -7,6 +9,7 @@ class ExportPanel extends React.Component {
     return (
       <div className="export-panel">
         <ExportButtons {...this.props} />
+        <EmailButton {...this.props} />
       </div>
     );
   }

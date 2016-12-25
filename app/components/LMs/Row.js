@@ -4,6 +4,7 @@ import { BaseRow } from '../Grid/Row';
 import Cell from '../Grid/Cell';
 import { toggleRowSelection } from '../../actions/appState';
 import ExportButtonsBulk from '../ExportButtonsBulk';
+import EmailButtonBulk from '../EmailButtonBulk';
 
 class Row extends BaseRow {
   onRowClick(row, e) {
@@ -21,6 +22,7 @@ class Row extends BaseRow {
           return (<Cell key={'cell-' + idx} className={col} value={row[col]} />);
         })}
         <td><ExportButtonsBulk id={row.data._id} entityType=""/></td>
+        <td><EmailButtonBulk id={row.data._id} entityType=""/></td>
       </tr>
     );
   }

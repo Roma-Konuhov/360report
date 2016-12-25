@@ -13,6 +13,7 @@ export default class Table extends BaseTable {
           return (<th key={idx}>{this.props.propsDbToScreenMap[column]}</th>);
         })}
         <th>Export all reports</th>
+        <th>Send all reports</th>
       </tr>
       </thead>
     );
