@@ -15,11 +15,47 @@ var Router = require('react-router');
 var routes = require('../app/routes');
 
 var EXPORT_DIR = os.tmpdir();
+var EXPORT_FILE_PREFIX = 'report-';
+var FILE_TO_REMOVE_AGE = 20 * 1000; // in milliseconds
+
+function removePreviouslySavedFiles() {
+  logger.info('Start cleaning temporary files');
+
+  var currentTime = +new Date();
+  fs.readdir(EXPORT_DIR, function(err, filenames) {
+    if (err) {
+      logger.error(err);
+      return false;
+    }
+    filenames.forEach(function(filename) {
+      if (filename.indexOf(EXPORT_FILE_PREFIX) === 0) {
+        var filepath = EXPORT_DIR + '/' + filename;
+        var fileStat = fs.statSync(filepath);
+        var ctime = fileStat.ctime.getTime();
+        if (currentTime - ctime > FILE_TO_REMOVE_AGE) {
+          logger.info('File "%s" was removed', filepath);
+          fs.unlink(filepath, function(err) {
+            if (err) {
+              logger.error('Removing of file "%s" has failed due to: %s', filepath, err);
+            }
+          });
+        }
+      }
+    });
+  });
+  logger.info('Finish cleaning temporary files');
+}
 
 exports.exportFile = function(res, reportConfig, cb) {
   var revieweeId = reportConfig.user._id;
   var exportFormat = reportConfig.format;
   var htmlFilepath = './public/' + (+new Date()) + '.html';
+
+  var username = reportConfig.user.name.replace(/\s+/, '-');
+  var exportFilename = EXPORT_FILE_PREFIX + username + '.' + exportFormat;
+  var exportFilepath = path.join(EXPORT_DIR, exportFilename);
+
+  removePreviouslySavedFiles();
 
   logger.info('Exporting of the report to format %s for user with ID %s', exportFormat, revieweeId);
 
@@ -61,7 +97,7 @@ exports.exportFile = function(res, reportConfig, cb) {
             fs.unlink(htmlFilepath);
             return cb(err);
           } else {
-            Export.exportFile(htmlFilepath, EXPORT_DIR, exportFormat, function(err, result) {
+            Export.exportFile(htmlFilepath, exportFilepath, function(err, result) {
               logger.info('HTML file was saved to "%s"', result.filepath);
               fs.unlink(htmlFilepath, function(err) {
                 if (err) {

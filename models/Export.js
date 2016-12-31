@@ -3,18 +3,12 @@ var phantom = require("phantom");
 //var pdf = require('html-pdf');
 var logger = require('../lib/logger')(module);
 var path = require('path');
-var os = require('os');
 var q = require('q');
 
-
-exports.exportFile = function(url, destDir = '', format = 'png', cb = _.identity()) {
-  var tmpDir = destDir || os.tmpdir();
-  var filename = (+new Date()) + '.' + format;
-  var filepath = path.join(tmpDir, filename);
+exports.exportFile = function(url, filepath, cb = _.identity()) {
   var page, ph;
 
-  logger.info('Directory to export: "%s"', tmpDir);
-  logger.info('Filename to export: "%s"', filename);
+  logger.info('Filename to export: "%s"', filepath);
   phantom.create()
     .then(function (_ph) {
       ph = _ph;
@@ -44,7 +38,7 @@ exports.exportFile = function(url, destDir = '', format = 'png', cb = _.identity
     })
     .then(function () {
       ph.exit();
-      cb(null, { filepath: filepath, filename: filename });
+      cb(null, { filepath: filepath, filename: path.basename(filepath) });
     })
     .catch(function () {
       ph.exit();
