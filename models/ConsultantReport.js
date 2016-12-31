@@ -198,7 +198,7 @@ consultantReportSchema.statics.getReviewees = function(cb) {
   var query = [
     { $group: { _id: "$reviewee", responders_number: { $sum: 1 }, relation: { $first: 'relation' } }},
     { $project: { username: "$_id", responders_number: "$responders_number" } },
-    {$sort: { username: 1 }},
+    { $sort: { username: 1 } },
   ];
 
   if (REPORTS_WITH_ONLY_RELATED_RESPONDERS) {

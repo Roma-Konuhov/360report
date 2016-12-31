@@ -133,7 +133,11 @@ h2 {
   padding-bottom: 30px;
   border-bottom: 1px solid #bbb;
   display: block;
-  overflow: hidden;
+  clear: both;
+}
+
+.clear {
+  clear: both;
 }
 
 /* make keyframes that tell the start state and the end state of our object */
@@ -472,5 +476,12 @@ h2 {
     &:hover {
       background: #f8f8f8;
     }
+  }
+}
+
+.company-chooser {
+  padding: 0 20px;
+  .btn-group {
+    margin: 0 10px;
   }
 }

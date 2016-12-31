@@ -22,7 +22,7 @@ var FILETYPE_TO_MODEL_MAP = _.zipObject(config.get('upload:fields'), [
  * @param {String} fileType
  * @returns {Array}
  */
-const getCallStackFor = function(fileType, filepath) {
+const getCallStackFor = function(fileType, filepath, company) {
   var Model = FILETYPE_TO_MODEL_MAP[fileType];
 
   switch (fileType) {
@@ -30,6 +30,7 @@ const getCallStackFor = function(fileType, filepath) {
       return [
         Model.dropCollection,
         Model.parse.bind(Model, filepath),
+        Model.filterByCompany.bind(Model, company),
         Model.validate,
         Model.saveCollection
       ];
@@ -69,7 +70,7 @@ exports.upload = function(req, res, next) {
         return next(new HttpError(405, message));
       }
 
-      var callStack = getCallStackFor(fileType, filepath);
+      var callStack = getCallStackFor(fileType, filepath, req.body.company);
 
       async.waterfall(callStack, function(err, result) {
         if (config.get('upload:removeAfterProcessing')) {

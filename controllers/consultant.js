@@ -14,11 +14,16 @@ exports.revieweesGet = function(req, res, next) {
     },
     function(reviewees, cb) {
       User.find({}, function(err, users) {
-        var result = [], item;
+        var result = [], item, user;
         if (!_.isEmpty(users)) {
           for (var i in reviewees) {
             item = _.clone(reviewees[i]);
-            item.id = _.find(users, {name: reviewees[i].username}).get('id');
+            user = _.find(users, {name: reviewees[i].username});
+            if (!user) {
+              logger.warn('No user with name "%s"', reviewees[i].username);
+              continue;
+            }
+            item.id = user.get('id');
             result.push(item);
           }
         }

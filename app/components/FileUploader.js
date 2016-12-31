@@ -32,11 +32,12 @@ const mapStateOnProps = () => {
   return {}
 };
 
-const mapDispatchOnProps = (dispatch) => {
+const mapDispatchOnProps = (dispatch, props) => {
   return {
     handleChange: (e) => {
       var formData = new FormData();
       formData.append(e.target.name, e.target.files[0]);
+      formData.append('company', props.company.value);
       dispatch(fileUploader(formData, e.target.name));
       e.target.value = '';
     }

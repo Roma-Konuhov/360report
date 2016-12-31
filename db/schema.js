@@ -14,6 +14,7 @@ exports.userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
   lm_name: String,
   lm_email: { type: String, unique: true },
+  company: String,
 }, options);
 
 

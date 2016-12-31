@@ -45,6 +45,7 @@
     "nodemailer": "^2.3.0",
     "phantom": "^3.2.1",
     "react": "15.1.0",
+    "react-bootstrap": "^0.30.7",
     "react-cookie": "^0.4.5",
     "react-dom": "15.1.0",
     "react-redux": "4.4.1",

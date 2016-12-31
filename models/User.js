@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var crypto = require('crypto');
 var bcrypt = require('bcrypt-nodejs');
 var mongoose = require('../db');
@@ -12,7 +13,8 @@ var CSV_TO_DB_MAP = {
   'Name': 'name',
   'Email': 'email',
   'LM': 'lm_name',
-  'Email of LM': 'lm_email',
+  //'Email of LM': 'lm_email',
+  'Company': 'company',
 };
 var EMAIL_DOMAIN = 'cogniance.com';
 
@@ -22,7 +24,7 @@ var validationRules = {
   'name': validRule.string().required(),
   'email': validRule.string().required(),
   'lm_name': validRule.string().required(),
-  'lm_email': validRule.string().required(),
+  'company': validRule.string().required(),
 };
 
 userSchema.methods.comparePassword = function(password, cb) {
@@ -65,14 +67,25 @@ userSchema.statics.parse = function(filename, cb) {
   });
 };
 
+userSchema.statics.filterByCompany = function(company, data, cb) {
+  logger.info('Filter data for company "%s"', company);
+  cb(null, data.filter(row => row.company === company));
+};
+
 userSchema.statics.saveCollection = function(data, cb) {
   var collection = [];
 
   if (isEmpty(data)) {
-    cb('Data are corrupted')
+    cb('Data are corrupted');
   }
 
   data.forEach(function(row, idx) {
+    const foundItem = _.find(data, {name: row.lm_name});
+    row.lm_email = foundItem ? foundItem.email : '';
+    if (!row.lm_email) {
+      logger.warn('LM "%s" doesn\'t have email. This person will not be saved', row.lm_name);
+      return;
+    }
     var user = new User(row);
     user.save(function(err, instance) {
       if (err) {
