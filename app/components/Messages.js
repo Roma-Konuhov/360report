@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 
 class Messages extends React.Component {
+  static SHOW_DELAY = 5000;
+
   constructor(props) {
     super(props);
     this.messageStorage = {};
@@ -19,11 +21,15 @@ class Messages extends React.Component {
     if (_.isEmpty(nextProps.messages)) {
       return;
     }
-    var key = Object.keys(nextProps.messages)[0];
 
+    var key = Object.keys(nextProps.messages)[0];
+    var delay = Messages.SHOW_DELAY;
+    if (nextProps.messages.error) {
+      delay = Math.max(Messages.SHOW_DELAY, nextProps.messages.error.length * 1000);
+    }
     this.timer = setTimeout(function(key) {
       this.handleClose(key);
-    }.bind(this, key), 5000);
+    }.bind(this, key), delay);
 
     if (this.messageStorage[key]) {
       this.messageStorage[key] = this.messageStorage[key].concat(nextProps.messages[key]);

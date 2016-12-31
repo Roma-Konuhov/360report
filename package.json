@@ -67,6 +67,7 @@
   },
   "devDependencies": {
     "babel-plugin-rewire": "1.0.0-rc-3",
+    "babel-preset-stage-0": "^6.16.0",
     "babel-register": "^6.8.0",
     "chai": "^3.5.0",
     "enzyme": "^2.3.0",

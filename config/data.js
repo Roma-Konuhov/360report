@@ -13,8 +13,6 @@ exports.consultantQuestions = [
   'Ensures that customers issues are resolved',
   'Demonstrates strong professional skills & knowledge',
   'I would recommend this person to work with',
-  'I suggest you to',
-  'I appreciate you for'
 ];
 
 exports.managerQeustions = [
@@ -31,7 +29,7 @@ exports.managerQeustions = [
   'Responds to customers requests promptly',
   'Ensures that customers issues are resolved',
   'Demonstrates strong professional skills & knowledge',
-  'Provides clearly defined objectives and priorities',
+   'Provides clearly defined objectives and priorities',
   'Creates a team spirit and encourages cooperation',
   'Acknowledges and celebrates team accomplishments',
   'Gives people freedom and trust to do their job',
@@ -47,8 +45,6 @@ exports.managerQeustions = [
   'Helps assess skills and create development plan',
   'Conducts coaching and supports as a mentor',
   'I would recommend this person to work with',
-  'I suggest you to',
-  'I appreciate you for'
 ];
 
 exports.relations = [
@@ -66,3 +62,8 @@ exports.answers = [
   'Agree',
   'Strongly Agree'
 ];
+
+exports.shareVariants = {
+  'I want to stay anonymous': false,
+  'I want to share my name with the reviewee': true,
+};

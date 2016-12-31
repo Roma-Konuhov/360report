@@ -24,7 +24,9 @@ var reviewFields = {
   responder: { type: String, required: true },
   reviewee: { type: String, required: true },
   allow_to_share: { type: Boolean, default: false },
-  relation: { type: Number, default: -1 }
+  relation: { type: Number, default: -1 },
+  i_suggest: String,
+  i_appreciate: String
 };
 
 var questionFields = {};

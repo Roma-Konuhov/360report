@@ -14,7 +14,7 @@ exports.revieweesGet = function(req, res) {
     },
     function(reviewees, cb) {
       User.find({}, function(err, users) {
-        var result = [], item;
+        var result = [], item, user;
         if (!_.isEmpty(users)) {
           for (var i in reviewees) {
             item = _.clone(reviewees[i]);

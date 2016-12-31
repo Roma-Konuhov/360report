@@ -5,6 +5,7 @@ var consultantReportSchema = require('../db/schema').consultantReportSchema;
 var CsvParser = require('./CsvParser');
 var logger = require('../lib/logger')(module);
 var answers = require('../config/data').answers;
+var shareVariants = require('../config/data').shareVariants;
 var questions = require('../config/data').consultantQuestions;
 var Relation = require('./Relation');
 var User = require('./User');
@@ -23,9 +24,11 @@ var collectionName = 'consultant_reports';
 
 var CSV_TO_DB_MAP = {
   'Timestamp': 'timestamp',
-  'Username': 'responder',
+  'Email Address': 'responder',
   'Evaluation is for': 'reviewee',
-  'Share my name': 'allow_to_share'
+  'Share my answers': 'allow_to_share',
+  'I suggest you to': 'i_suggest',
+  'I appreciate you for': 'i_appreciate',
 };
 
 questions.forEach(function(question, idx) {
@@ -36,7 +39,9 @@ var validationRules = {
   'timestamp': validRule.date(),
   'responder': validRule.string().email().required(),
   'reviewee': validRule.string().required(),
-  'allow_to_share': validRule.string(),
+  'allow_to_share': validRule.any().optional(),
+  'i_suggest': validRule.any().optional(),
+  'i_appreciate': validRule.any().optional(),
 };
 questions.forEach(function(question, idx) {
   validationRules['q' + (1 + idx)] = validRule.string().required();
@@ -91,6 +96,8 @@ consultantReportSchema.statics.castAnswers = function(data, cb) {
       if (key.search(/^q\d{1,2}$/) !== -1) {
         lcValue = row[key].toLowerCase();
         result[key] = answersTextToNumMap[lcValue];
+      } else if (key === 'allow_to_share') {
+        result[key] = shareVariants[row[key]];
       } else {
         result[key] = row[key];
       }
@@ -115,7 +122,7 @@ consultantReportSchema.statics.saveCollection = function(data, cb) {
   var userCollection = [];
 
   if (_.isEmpty(data)) {
-    cb('Data are corrupted')
+    cb('Data are corrupted');
   }
 
   data.forEach(function(row, idx) {
