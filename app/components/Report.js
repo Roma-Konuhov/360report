@@ -74,9 +74,11 @@ class Report extends React.Component {
   render() {
     return (
       <div>
-        <h1>360&deg; Feedback Report</h1>
-        <UserData user={this.props.user} />
+        <div className="block">
+          <h1>360&deg; Feedback Report</h1>
+        </div>
         <InfoBlock />
+        <UserData user={this.props.user} />
         {this.props.reports.map((report, idx) => {
           return (
             <div key={`chart-wrapper-${idx}`} className="chart-block">

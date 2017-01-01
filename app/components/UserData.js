@@ -34,15 +34,10 @@ class UserData extends React.Component {
 
   render() {
     return (
-      <div className="user-data">
+      <div className="user-data block">
         <Display if={this.props.user} nowrap="true">
-          <h2>{this.props.user.name}, H2 2016</h2>
+          <h3>{this.props.user.name}, H2 2016</h3>
         </Display>
-        <Table
-          data={this.state.data}
-          columns={this.columns}
-          propsDbToScreenMap={this.propsDbToScreenMap}
-        />
       </div>
     );
   }

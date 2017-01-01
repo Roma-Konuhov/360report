@@ -281,7 +281,7 @@ consultantReportSchema.statics.getReport = function(userId, cb) {
         logger.error(err);
         return cb(err, null);
       }
-      logger.info('Aggregated query to get answers grouped by responders roles was completed successfully');
+      logger.info('Aggregated query to get answers grouped by responders roles was completed successfully: %j', data);
       cb(null, data);
     });
 };

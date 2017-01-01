@@ -35,13 +35,13 @@ footer {
   border-top: 1px solid #e0e0e0;
 }
 
-h1 {
+h1, h2, h3 {
   text-align: center;
-  margin: 21px 0 36px;
+  margin: 0;
 }
 
-h2 {
-  margin-top: 0;
+h3, h4, h5, h6 {
+  margin: 0;
 }
 
 *:focus {
@@ -128,16 +128,41 @@ h2 {
   }
 }
 
-#file-upload-container {
+.file-upload-container {
   margin-top: 25px;
   padding-bottom: 30px;
   border-bottom: 1px solid #bbb;
   display: block;
-  clear: both;
 }
 
 .clear {
   clear: both;
+}
+
+.block {
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid #e7e7e7;
+  padding: 15px 0;
+  text-align: left;
+
+  &.export-panel {
+    text-align: right;
+  }
+}
+
+.export-buttons {
+  display: inline-block;
+
+  .btn {
+    background: transparent;
+    border: 1px solid #aaa;
+    margin-left: 15px;
+
+    &:hover {
+      background: #f8f8f8;
+    }
+  }
 }
 
 /* make keyframes that tell the start state and the end state of our object */
@@ -264,11 +289,6 @@ h2 {
 }
 
 .user-data {
-  display: inline-block;
-  width: 40%;
-  float: left;
-  padding-right: 20px;
-
   .data-table {
     th, td {
       text-align: center;
@@ -294,8 +314,8 @@ h2 {
 }
 
 .info-block {
-  display: inline-block;
-  width: 60%;
+  display: block;
+  width: 100%;
 }
 
 .highcharts-title tspan {
@@ -455,26 +475,6 @@ h2 {
         -moz-animation-delay: 5s;
         animation-delay: 5s;
       }
-    }
-  }
-}
-
-.export-panel {
-  border-bottom: 1px solid #e7e7e7;
-  padding: 15px 0;
-  text-align: right;
-}
-
-.export-buttons {
-  display: inline-block;
-
-  .btn {
-    background: transparent;
-    border: 1px solid #aaa;
-    margin-left: 15px;
-
-    &:hover {
-      background: #f8f8f8;
     }
   }
 }

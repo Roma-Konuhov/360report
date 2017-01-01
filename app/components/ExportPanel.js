@@ -7,7 +7,7 @@ import EmailButton from './EmailButton';
 class ExportPanel extends React.Component {
   render() {
     return (
-      <div className="export-panel">
+      <div className="export-panel block">
         <ExportButtons {...this.props} />
         <EmailButton {...this.props} />
       </div>

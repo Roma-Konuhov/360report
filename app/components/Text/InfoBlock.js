@@ -3,7 +3,7 @@ import React from 'react';
 class InfoBlock extends React.Component {
   render() {
     return (
-      <div className="info-block">
+      <div className="block">
         <p>
           This confidential 360° feedback report has been generated using information gathered both from yourself and from the cremates who have provided feedback. It summarizes how you have been rated by your various (groups of) raters on each of the relevant competencies.
         </p>

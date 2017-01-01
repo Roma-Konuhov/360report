@@ -30,7 +30,7 @@ class FileUploadContainer extends Component {
 
     return (
       <div>
-        <div id="file-upload-container">
+        <div className="file-upload-container">
           <div className="company-chooser">
             <label>Company</label>
             <DropdownButton title={this.state.company.title} bsStyle="default" key={uniqueId} id={uniqueId} onSelect={(value) => this.handleCompanySelect(value)}>
@@ -40,7 +40,7 @@ class FileUploadContainer extends Component {
           </div>
           <div className="clear" />
         </div>
-        <div id="file-upload-container">
+        <div className="file-upload-container">
           <Display if={this.props.peopleRelations} nowrap="true">
             <FileUploader label="Consultant report (csv file)" name="consultant_report" { ...props } />
           </Display>
