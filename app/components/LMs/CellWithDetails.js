@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ExportPdfButton from '../ExportPdfButton';
-import EmailButton from '../EmailButton';
+import PublishButton from '../PublishButton';
 
 class CellWithDetails extends Component {
   render() {
@@ -23,8 +23,8 @@ class CellWithDetails extends Component {
                   <ExportPdfButton id={row.subordinate_ids[idx]} entityType="manager" />
                 </span>
                 <span>
-                  <label>Send report by email</label>
-                  <EmailButton id={row.subordinate_ids[idx]} />
+                  <label>Publish on Google Drive</label>
+                  <PublishButton id={row.subordinate_ids[idx]} />
                 </span>
               </div>
             </div>

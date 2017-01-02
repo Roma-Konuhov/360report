@@ -16,7 +16,7 @@ var routes = require('../app/routes');
 
 var EXPORT_DIR = os.tmpdir();
 var EXPORT_FILE_PREFIX = 'report-';
-var FILE_TO_REMOVE_AGE = 20 * 1000; // in milliseconds
+var FILE_TO_REMOVE_AGE = 1800 * 1000; // 30min in milliseconds
 
 function removePreviouslySavedFiles() {
   logger.info('Start cleaning temporary files');

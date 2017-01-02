@@ -37,5 +37,24 @@
       "people_relations",
       "users"
     ]
+  },
+  "google": {
+    "reportDirectory": "360 results",
+    "api": {
+      "credentials": {
+        "directory": ".credentials/",
+        "filename": "google-api.json"
+      },
+      "secret": {
+        "directory": ".credentials/",
+        "filename": "client-secret.json"
+      },
+      "scriptId": "1e6hyU47g9oxBmRwb624stuM2Oj0PG7rheERYPeK0guVPwCebQP-SOw0a",
+      "scopes": [
+        "https://www.googleapis.com/auth/drive",
+        "https://www.googleapis.com/auth/script.external_request",
+        "https://www.googleapis.com/auth/spreadsheets"
+      ]
+    }
   }
 }

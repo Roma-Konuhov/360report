@@ -45,6 +45,9 @@ module.exports = function(app) {
   app.get('/lms', userController.lmsGet);
   app.post('/email-to-lm/subordinates/:lmId', userController.emailSubordinateReportsPost);
   app.post('/email-to-lm/reviewee/:revieweeId', userController.emailRevieweeReportPost);
+  app.post('/publish/subordinates/:lmId', userController.publishSubordinateReportsPost);
+  app.post('/publish/reviewee/:revieweeId', userController.publishRevieweeReportPost);
+  app.post('/publish/all/', userController.publishAllReportsPost);
 
   app.get('/reviewees-by-consultants', consultantController.revieweesGet);
   app.get('/consultant/report/:id', consultantController.reportGet);

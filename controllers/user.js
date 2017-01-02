@@ -1,9 +1,12 @@
 var HttpError = require('../lib/error').HttpError;
 var User = require('../models/User');
 var logger = require('../lib/logger')(module);
+var config = require('../config');
 var mailer = require('./mailer');
 var consultant = require('./consultant');
 var manager = require('./manager');
+var gApi = require('../models/GoogleApi');
+var mongoose = require('../db');
 
 exports.userGet = function(req, res, next) {
   var id = req.params.id;
@@ -140,6 +143,176 @@ exports.emailSubordinateReportsPost = function(req, res, next) {
           }
           res.json({message: `Email was sent to ${lm.name}`})
         });
+      });
+    });
+  });
+};
+
+/**
+ * Publish reviewee's report on Google drive to driectory with LM name
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.publishRevieweeReportPost = function(req, res, next) {
+  logger.info('publish reviewes\'s report to its LM on Google drive');
+
+  var revieweeId = req.params.revieweeId;
+
+  User.getLMForReviewee(revieweeId, function(err, lm) {
+    if (err) {
+      return next(new HttpError(400, err.message));
+    }
+
+    consultant.exportFile(revieweeId, 'pdf', res, function(err, consultantReport) {
+      manager.exportFile(revieweeId, 'pdf', res, function(err, managerReport) {
+        var reports = [consultantReport, managerReport];
+        var reportDirectory = config.get('google:reportDirectory');
+
+        gApi.createPath(`${reportDirectory}/${lm.name}`, function(err, directoryId) {
+          if (err) {
+            logger.error('Error during creating of the LM\'s directory: %s', err.message);
+            return next(new HttpError(400, err.message));
+          }
+
+          reports.forEach(function(report) {
+            if (report.status !== 'ok') {
+              return;
+            }
+            const params = {
+              srcFilepath: report.filepath,
+              destFilename: report.username + '.pdf',
+              destDirectory: directoryId
+            };
+            gApi.upload(params, function(err) {
+              if (err) {
+                logger.error('Error during publishing of the %s\'s report to LM directory "%s": %s', report.username, lm.name, err.message);
+                return next(new HttpError(400, err.message));
+              }
+              logger.info('Publishing of the %s\'s report  to LM directory "%s" was completed successfully', report.username, lm.name);
+              res.json({ message: 'Publishing was completed successfully' });
+            });
+          });
+        });
+      });
+    });
+  });
+};
+
+/**
+ * Publish on Google drive reports of all subrdinates of the specified LM
+ * to the directory with LM name
+ *
+ * Controller
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.publishSubordinateReportsPost = function(req, res, next) {
+  logger.info('publish reports for all subordinators of LM');
+
+  var lmId = req.params.lmId;
+
+  publishSubordinateReports(lmId, res, function(err, result) {
+    if (err) {
+      return next(new HttpError(400, err.message));
+    }
+    res.json({ message: result });
+  });
+};
+
+/**
+ * Publish on Google drive reports of all subrdinates of the specified LM
+ * to the directory with LM name
+ *
+ * @param lmId
+ * @param res
+ * @param cb
+ */
+function publishSubordinateReports(lmId, res, cb) {
+  User.findById(lmId, function(err, lm) {
+    if (err) {
+      return next(new HttpError(400, err.message));
+    }
+
+    consultant.exportBulk(lmId, 'pdf', res, function(err, consultantResult, consultantReports) {
+      manager.exportBulk(lmId, 'pdf', res, function(err, managerResult, managerReports) {
+        var reports = consultantReports.concat(managerReports);
+        var validReports = reports.filter(function(report) { return report.status === 'ok' });
+        var successMessages = [];
+        var errors = [];
+        var reportDirectory = config.get('google:reportDirectory');
+
+        gApi.createPath(`${reportDirectory}/${lm.name}`, function(err, directoryId) {
+          if (err) {
+            logger.error('Error during creating of the LM\'s directory: %s', err.message);
+            return cb(err);
+          }
+
+          var processCounter = 0;
+          validReports.forEach(function(report) {
+            const params = {
+              srcFilepath: report.filepath,
+              destFilename: report.username + '.pdf',
+              destDirectory: directoryId
+            };
+            gApi.upload(params, function(err) {
+              if (err) {
+                logger.error('Error during publishing of the %s\'s report to LM directory "%s": %s', report.username, lm.name, err.message);
+                errors.push(`Error during publishing of the report of ${report.username}: ${err.message}`);
+              } else {
+                logger.info('Publishing of the %s\'s report  to LM directory "%s" was completed successfully', report.username, lm.name);
+                successMessages.push(`Publishing of the report of ${report.username} was completed successfully`);
+              }
+              if (++processCounter === validReports.length) {
+                if (errors.length) {
+                  return cb({ message: errors });
+                }
+                cb(null, successMessages);
+              }
+            });
+          });
+        });
+      });
+    });
+  });
+}
+
+/**
+ * Publish on Google drive reports of all subrdinates of the specified LM
+ * to the directory with LM name
+ *
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.publishAllReportsPost = function(req, res, next) {
+  logger.info('publish reports for all subordinators of all LMs');
+
+  var errors = [];
+  var successMessages = [];
+
+  User.getLMList(function(err, lms) {
+    if (err) {
+      return next(new HttpError(400, err.message));
+    }
+
+    lms.forEach(function(lm, idx) {
+      publishSubordinateReports(lm.data._id, res, function(err, result) {
+        if (err) {
+          errors = errors.concat(err.message);
+        } else {
+          successMessages.concat(result);
+        }
+
+        if (idx === lms.length - 1) {
+          if (errors.length) {
+            return next(new HttpError(400, errors));
+          }
+          res.json({ message: successMessages });
+        }
       });
     });
   });

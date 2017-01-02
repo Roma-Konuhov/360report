@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import { connect } from 'react-redux';
+import ActionPanel from './ActionPanel';
 
 import Table from './Table';
 
@@ -40,6 +41,7 @@ class LMs extends Component {
   render() {
     return (
       <div className="container">
+        <ActionPanel />
         <Table
           data={this.getDataWithSelectedItems()}
           columns={this.columns}
