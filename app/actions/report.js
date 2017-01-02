@@ -13,6 +13,13 @@ function successAnswers(items) {
   };
 }
 
+function successSuggestions(items) {
+  return {
+    type: 'REPORT_ADD_SUGGESTIONS',
+    items
+  };
+}
+
 function successUser(item) {
   return {
     type: 'REPORT_ADD_USER',
@@ -45,6 +52,28 @@ export function fetchReportStatistics(entityType, id) {
       if (response.ok) {
         return response.json().then((json) => {
           dispatch(successStatistics(json));
+        });
+      } else {
+        return response.json().then((json) => {
+          dispatch(fail(json));
+        });
+      }
+    });
+  };
+}
+
+export function fetchReportSuggestions(entityType, id) {
+  return (dispatch) => {
+    dispatch({ type: 'CLEAR_MESSAGES' });
+    dispatch({ type: 'SEND_REQUEST' });
+    return fetch(`/${entityType}/suggestions/${id}`, {
+      method: 'get',
+      headers: { 'Content-Type': 'application/json' },
+    }).then((response) => {
+      dispatch({ type: 'RECEIVE_REQUEST' });
+      if (response.ok) {
+        return response.json().then((json) => {
+          dispatch(successSuggestions(json));
         });
       } else {
         return response.json().then((json) => {

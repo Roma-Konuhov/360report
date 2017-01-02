@@ -16,6 +16,12 @@ var routes = require('../app/routes');
 
 var EXPORT_DIR = os.tmpdir();
 var EXPORT_FILE_PREFIX = 'report-';
+/**
+ * Time interval determines period after
+ * which these files can be removed
+ *
+ * @type {number}
+ */
 var FILE_TO_REMOVE_AGE = 1800 * 1000; // 30min in milliseconds
 
 function removePreviouslySavedFiles() {
@@ -69,6 +75,7 @@ exports.exportFile = function(res, reportConfig, cb) {
     report: {
       answers: reportConfig.answers,
       statistics: reportConfig.statistics,
+      suggestions: reportConfig.suggestions,
       user: reportConfig.user
     }
   });

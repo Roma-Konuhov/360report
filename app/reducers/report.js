@@ -1,6 +1,7 @@
 const initialState = {
   answers: [],
   statistics: [],
+  suggestions: [],
   user: {}
 };
 
@@ -13,6 +14,10 @@ export default function report(state = initialState , action) {
     case 'REPORT_ADD_STATISTICS':
       return Object.assign({}, state, {
         statistics: action.items
+      });
+    case 'REPORT_ADD_SUGGESTIONS':
+      return Object.assign({}, state, {
+        suggestions: action.items
       });
     case 'REPORT_ADD_USER':
       return Object.assign({}, state, {

@@ -277,13 +277,42 @@ consultantReportSchema.statics.getReport = function(userId, cb) {
   }
 
   ConsultantReport.aggregate(query, function(err, data) {
-      if (err) {
-        logger.error(err);
-        return cb(err, null);
-      }
-      logger.info('Aggregated query to get answers grouped by responders roles was completed successfully: %j', data);
-      cb(null, data);
-    });
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get answers grouped by responders roles was completed successfully: %j', data);
+    cb(null, data);
+  });
+};
+
+/**
+ * Get suggestions/appreciates from all responders
+ *
+ * @param userId
+ * @param cb
+ */
+consultantReportSchema.statics.getSuggestions = function(userId, cb) {
+  logger.info('Request to get suggestions for reviewee with ID "%s"', userId);
+
+  var query = [
+    {$lookup: {from:'users',localField:'reviewee',foreignField:'name',as:'joined_reviewee'}},
+    {$match:{'joined_reviewee._id': mongoose.Types.ObjectId(userId)}},
+    {$sort: {'_id.relation': -1}}
+  ];
+
+  if (REPORTS_WITH_ONLY_RELATED_RESPONDERS) {
+    query.unshift({$match: { 'relation': { $gte: 0 }}})
+  }
+
+  ConsultantReport.aggregate(query, function(err, data) {
+    if (err) {
+      logger.error(err);
+      return cb(err, null);
+    }
+    logger.info('Aggregated query to get suggestions was completed successfully: %j', data);
+    cb(null, data);
+  });
 };
 
 /**

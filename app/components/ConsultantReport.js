@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Report from './Report';
-import { fetchReportStatistics, fetchReportAnswers, fetchReportUser } from '../actions/report';
+import { fetchReportSuggestions, fetchReportStatistics, fetchReportAnswers, fetchReportUser } from '../actions/report';
 import ActionPanel from './ActionPanel';
 
 class ConsultantReport extends React.Component {
@@ -9,6 +9,7 @@ class ConsultantReport extends React.Component {
     const id = this.props.params.id;
     this.props.dispatch(fetchReportAnswers('consultant', id));
     this.props.dispatch(fetchReportStatistics('consultant', id));
+    this.props.dispatch(fetchReportSuggestions('consultant', id));
     this.props.dispatch(fetchReportUser(id));
   }
 
@@ -20,6 +21,7 @@ class ConsultantReport extends React.Component {
           user={this.props.user}
           reports={this.props.reports}
           statistics={this.props.statistics}
+          suggestions={this.props.suggestions}
         />
       </div>
     );
@@ -30,6 +32,7 @@ const mapStateOnProps = (state) => {
   return {
     reports: state.report.answers,
     statistics: state.report.statistics,
+    suggestions: state.report.suggestions,
     user: state.report.user
   }
 };

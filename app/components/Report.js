@@ -8,6 +8,7 @@ import TextBlockAfterStat from './Text/TextBlockAfterStat';
 import UserData from './UserData';
 import PersonalStatistics from './Statistics/Personal';
 import Statistics from './Statistics';
+import Suggestions from './Suggestions';
 
 class Report extends React.Component {
   getXCategories(relationLabels, respondersNumber) {
@@ -71,6 +72,26 @@ class Report extends React.Component {
     return resultArray;
   }
 
+  getSuggestions(items) {
+    return items.map(item => {
+      return {
+        suggestion: item.i_suggest,
+        allow_to_share: item.allow_to_share,
+        responder: item.responder,
+      }
+    });
+  }
+
+  getAppreciations(items) {
+    return items.map(item => {
+      return {
+        suggestion: item.i_appreciate,
+        allow_to_share: item.allow_to_share,
+        responder: item.responder,
+      }
+    });
+  }
+
   render() {
     return (
       <div>
@@ -85,7 +106,7 @@ class Report extends React.Component {
               <Display if={this.props.statistics[idx]}>
                 <PersonalStatistics data={this.props.statistics[idx]} />
               </Display>
-              <table className="title"><tbody><tr><td>{report.text}</td></tr></tbody></table>
+              <table className="title"><tbody><tr><td><h4>{report.text}</h4></td></tr></tbody></table>
               <div className="chart-wrapper">
               <Chart
                 container={`question-${idx}`}
@@ -103,6 +124,12 @@ class Report extends React.Component {
           <Statistics data={this.addDataByField(this.props.statistics, this.props.reports, 'text')} />
         </Display>
         <TextBlockAfterStat />
+        <Display if={_.some(this.props.suggestions, (item) => item.i_suggest.length )}>
+          <Suggestions data={this.getSuggestions(this.props.suggestions)} title="I suggest you to..." />
+        </Display>
+        <Display if={_.some(this.props.suggestions, (item) => item.i_appreciate.length )}>
+          <Suggestions data={this.getAppreciations(this.props.suggestions)} title="I appreciate you for..." />
+        </Display>
       </div>
     );
   }
@@ -111,7 +138,8 @@ class Report extends React.Component {
 Report.propTypes = {
   user: React.PropTypes.object.isRequired,
   reports: React.PropTypes.array.isRequired,
-  statistics: React.PropTypes.array.isRequired
+  statistics: React.PropTypes.array.isRequired,
+  suggestions: React.PropTypes.array.isRequired,
 };
 
 export default Report;

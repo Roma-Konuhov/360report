@@ -52,6 +52,7 @@ module.exports = function(app) {
   app.get('/reviewees-by-consultants', consultantController.revieweesGet);
   app.get('/consultant/report/:id', consultantController.reportGet);
   app.get('/consultant/statistics/:id', consultantController.statisticsGet);
+  app.get('/consultant/suggestions/:id', consultantController.suggestionsGet);
   app.post('/consultant/export/:format/:id', consultantController.exportFilePost);
   app.post('/consultant/export/bulk/:format/:id', consultantController.exportBulkPost);
 

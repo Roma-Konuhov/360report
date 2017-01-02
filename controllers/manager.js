@@ -59,6 +59,15 @@ exports.statisticsGet = function(req, res) {
   });
 };
 
+exports.suggestionsGet = function(req, res, next) {
+  ManagerReport.getSuggestions(req.params.id, function(err, result) {
+    if (err) {
+      return next(new HttpError(400, err.message));
+    }
+    res.json(result)
+  });
+};
+
 /**
  * Action to export report to file (PDF or PNG)
  *
@@ -99,6 +108,7 @@ var exportFile = function(id, format, res, cb) {
   async.parallel({
     answers: getReportAnswers.bind(ManagerReport, id),
     statistics: ManagerReport.getStatistics.bind(ManagerReport, id),
+    suggestions: ManagerReport.getSuggestions.bind(ManagerReport, id),
     user: User.findById.bind(User, id),
   }, function(err, reportConfig) {
     logger.info("report config: %j", reportConfig);
@@ -164,6 +174,7 @@ var exportBulk = function(lmId, format, res, cb) {
       async.parallel({
         answers: getReportAnswers.bind(ManagerReport, subordinateId),
         statistics: ManagerReport.getStatistics.bind(ManagerReport, subordinateId),
+        suggestions: ManagerReport.getSuggestions.bind(ManagerReport, subordinateId),
         user: User.findById.bind(User, subordinateId),
       }, function(err, reportConfig) {
         logger.info("report config: %j", reportConfig);
