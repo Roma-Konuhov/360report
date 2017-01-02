@@ -9,6 +9,7 @@ import UserData from './UserData';
 import PersonalStatistics from './Statistics/Personal';
 import Statistics from './Statistics';
 import Suggestions from './Suggestions';
+import PersonalPlan from './PersonalPlan';
 
 class Report extends React.Component {
   getXCategories(relationLabels, respondersNumber) {
@@ -130,6 +131,7 @@ class Report extends React.Component {
         <Display if={_.some(this.props.suggestions, (item) => item.i_appreciate.length )}>
           <Suggestions data={this.getAppreciations(this.props.suggestions)} title="I appreciate you for..." />
         </Display>
+        <PersonalPlan />
       </div>
     );
   }

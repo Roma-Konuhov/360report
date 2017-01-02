@@ -47,15 +47,66 @@ html
       .personal-statistics .data-table td.avg_norm {
         color: #00b0f0 !important;
       }
-
       .personal-statistics .data-table td.self_gap.positive,
       .personal-statistics .data-table td.avg_gap.positive {
         color: #1ab230 !important;
       }
-
       .personal-statistics .data-table td.self_gap.negative,
       .personal-statistics .data-table td.avg_gap.negative {
         color: #f00 !important;
+      }
+
+      .statistics .data-table th,
+      .statistics .data-table td {
+          text-align: center;
+      }
+      .statistics .data-table th {
+          background: #000 !important;
+          color: #ddd !important;
+      }
+      .statistics .data-table th:first-child,
+      .statistics .data-table td:first-child {
+          text-align: left !important;
+      }
+      .statistics .data-table thead tr,
+      .statistics .data-table tbody tr {
+          font-weight: bold !important;
+          border-top: 3px solid #000 !important;
+          border-bottom: 3px solid #000 !important;
+      }
+      .statistics .data-table tbody tr:nth-child(2n + 1) {
+          background: #e7e7e7 !important;
+      }
+
+      #personal-dev-plan table {
+        width: 100% !important;
+        height: 800px !important;
+        margin: 40px 0 !important;
+        color: #ffffff !important;
+        font-weight: bold !important;
+      }
+      #personal-dev-plan table td {
+        padding: 5px !important;
+        border: 1px solid #3c3c3c !important;
+      }
+
+      #personal-dev-plan table thead td {
+        color: #ffffff !important;
+        height: 15px !important;
+        text-align: center !important;
+        background: #3c3c3c !important;
+      }
+      #personal-dev-plan table thead td:first-child {
+        background: #CCCCCC !important;
+      }
+      #personal-dev-plan table tbody td:first-child {
+        background: #3c3c3c !important;
+        width: 140px !important;
+      }
+      #personal-dev-plan table tbody td:first-child span {
+        color: #ffffff !important;
+        text-align: center !important;
+        vertical-align: middle !important;
       }
 body
     #app!= html

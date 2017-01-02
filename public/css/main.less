@@ -498,3 +498,38 @@ h3, h4, h5, h6 {
     margin: 0 10px;
   }
 }
+
+#personal-dev-plan {
+  table {
+    width: 80%;
+    margin: 40px auto;
+    color: white;
+    font-weight: bold;
+    td {
+      padding: 5px;
+      border: 1px solid #3c3c3c;
+    }
+    thead td {
+      height: 15px;
+      text-align: center;
+      background: #3c3c3c;
+      &:first-child {
+        background: #CCCCCC;
+      }
+    }
+    tbody td:first-child {
+      background: #3c3c3c;
+      span {
+        transform: scale(-1, -1);
+        writing-mode: vertical-lr;
+        /* text-orientation: inherit; */
+        height: 200px;
+        text-align: center;
+        vertical-align: middle;
+        width: 8px;
+        position: relative;
+        left: 13px;
+      }
+    }
+  }
+}
