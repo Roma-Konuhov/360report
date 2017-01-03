@@ -35,7 +35,8 @@
       "consultant_report",
       "manager_report",
       "people_relations",
-      "users"
+      "users",
+      "google_api_credentials"
     ]
   },
   "google": {

@@ -15,7 +15,7 @@ class FileUploader extends React.Component {
       <div className="file-uploader col-sm-3">
         <form action={url} encType="multipart/form-data" method="post">
           <label>{label}</label>
-          <input className="filestyle" type="file" name={name} onChange={handleChange} accept=".csv" />
+          <input className="filestyle" type="file" name={name} onChange={handleChange} accept={this.props.accept} />
         </form>
       </div>
     );
@@ -25,7 +25,8 @@ class FileUploader extends React.Component {
 FileUploader.defaultProps = {
   url: '/upload',
   label: 'File',
-  name: 'file'
+  name: 'file',
+  accept: ".csv",
 };
 
 const mapStateOnProps = () => {

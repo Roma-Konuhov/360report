@@ -31,13 +31,14 @@ class FileUploadContainer extends Component {
     return (
       <div>
         <div className="file-upload-container">
-          <div className="company-chooser">
+          <div className="company-chooser col-sm-3">
             <label>Company</label>
             <DropdownButton title={this.state.company.title} bsStyle="default" key={uniqueId} id={uniqueId} onSelect={(value) => this.handleCompanySelect(value)}>
               <MenuItem eventKey="0">Cogniance</MenuItem>
               <MenuItem eventKey="1">Cloudmade</MenuItem>
             </DropdownButton>
           </div>
+          <FileUploader label="Google API credentials" name="google_api_credentials" accept=".json" { ...props } />
           <div className="clear" />
         </div>
         <div className="file-upload-container">

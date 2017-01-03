@@ -8,12 +8,14 @@ var ConsultantReport = require('../models/ConsultantReport');
 var ManagerReport = require('../models/ManagerReport');
 var Relation = require('../models/Relation');
 var User = require('../models/User');
+var gApi = require('../models/GoogleApi');
 
 var FILETYPE_TO_MODEL_MAP = _.zipObject(config.get('upload:fields'), [
   ConsultantReport,
   ManagerReport,
   Relation,
-  User
+  User,
+  gApi
 ]);
 
 /**
@@ -51,6 +53,10 @@ const getCallStackFor = function(fileType, filepath, company) {
         Model.validate,
         Model.castAnswers,
         Model.saveCollection
+      ];
+    case 'google_api_credentials':
+      return [
+        Model.storeCredentials.bind(Model, filepath)
       ];
     default:
       return [];

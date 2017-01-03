@@ -6,7 +6,6 @@ var mailer = require('./mailer');
 var consultant = require('./consultant');
 var manager = require('./manager');
 var gApi = require('../models/GoogleApi');
-var mongoose = require('../db');
 
 exports.userGet = function(req, res, next) {
   var id = req.params.id;
@@ -157,6 +156,11 @@ exports.emailSubordinateReportsPost = function(req, res, next) {
  */
 exports.publishRevieweeReportPost = function(req, res, next) {
   logger.info('publish reviewes\'s report to its LM on Google drive');
+
+  const auth = gApi.checkAuth();
+  if (auth.status === 'unauthorized') {
+    return res.status(401).json({ authUrl: auth.authUrl });
+  }
 
   var revieweeId = req.params.revieweeId;
 

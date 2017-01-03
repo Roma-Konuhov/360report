@@ -19,9 +19,9 @@ var SECRET_PATH = SECRET_DIR + config.get('google:api:secret:filename');
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
-  var clientSecret = credentials.installed.client_secret;
-  var clientId = credentials.installed.client_id;
-  var redirectUrl = credentials.installed.redirect_uris[0];
+  var clientSecret = credentials.web.client_secret;
+  var clientId = credentials.web.client_id;
+  var redirectUrl = credentials.web.redirect_uris[0];
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
@@ -39,37 +39,90 @@ function authorize(credentials, callback) {
       callback(oauth2Client);
     }
   });
-};
+}
 
 exports.authorize = authorize;
 
+exports.checkAuth = function() {
+  try {
+    const credentials = fs.readFileSync(SECRET_PATH);
+
+    return isAuthorized(JSON.parse(credentials));
+  } catch (e) {
+    logger.error('Error loading client secret file: ' + e.message);
+    return {status: 'error', message: e.message};
+  }
+};
+
+exports.approveAuth = function(code, cb) {
+  try {
+    var credentials = JSON.parse(fs.readFileSync(SECRET_PATH));
+    logger.info('credentials', credentials);
+    var clientSecret = credentials.web.client_secret;
+    var clientId = credentials.web.client_id;
+    var redirectUrl = credentials.web.redirect_uris[0];
+    var auth = new googleAuth();
+    var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+
+    return saveToken(oauth2Client, code, cb);
+  } catch (e) {
+    logger.error('Error loading client secret file: ' + e.message);
+    return { message: e.message };
+  }
+};
+
+function isAuthorized(credentials) {
+  var clientSecret = credentials.web.client_secret;
+  var clientId = credentials.web.client_id;
+  var redirectUrl = credentials.web.redirect_uris[0];
+  var auth = new googleAuth();
+  var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+
+  try {
+    // Check if we have previously stored a token.
+    // If file doesn't exist then exception will be thrown
+    const token = fs.readFileSync(TOKEN_PATH, { encoding: 'utf-8' });
+    // else token exists and can be used
+    logger.info('Authorization success. Token: %j', token);
+    oauth2Client.credentials = JSON.parse(token);
+    google.options({
+      auth: oauth2Client
+    });
+
+    return { status: 'ok' };
+
+  } catch (e) {
+    logger.info('Authorization failed');
+    var authUrl = oauth2Client.generateAuthUrl({
+      access_type: 'online',
+      scope: config.get('google:api:scopes')
+    });
+    logger.info('Generate auth URL %s', authUrl);
+
+    return { status: 'unauthorized', authUrl: authUrl };
+  }
+}
+
 /**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
+ * Store new token
  *
  * @param {google.auth.OAuth2} oauth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback to call with the authorized
+ * @param {String} code Access key
+ * @param {Function} callback The callback to call with the authorized
  *     client.
  */
-function getNewToken(oauth2Client, callback) {
-  var authUrl = oauth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: config.get('google:api:scopes')
-  });
-  logger.info('get new token %s', authUrl);
-  http.get(authUrl, function(code){
-    oauth2Client.getToken(code, function(err, token) {
-      if (err) {
-        logger.error('Error while trying to retrieve access token', err);
-        return;
-      }
-      oauth2Client.credentials = token;
-      storeToken(token);
-      google.options({
-        auth: oauth2Client
-      });
-      callback(oauth2Client);
+function saveToken(oauth2Client, code, callback) {
+  logger.info('Save token %s', code);
+  oauth2Client.getToken(code, function(err, token) {
+    if (err) {
+      return callback(err);
+    }
+    oauth2Client.credentials = token;
+    storeToken(token);
+    google.options({
+      auth: oauth2Client
     });
+    callback(null, oauth2Client);
   });
 }
 
@@ -89,6 +142,23 @@ function storeToken(token) {
   fs.writeFile(TOKEN_PATH, JSON.stringify(token));
   logger.info('Token stored to ' + TOKEN_PATH);
 }
+
+/**
+ * Save uploaded credentials on the disk
+ *
+ * @param filepath
+ * @param cb
+ */
+exports.storeCredentials = function(filepath, cb) {
+  var rs = fs.createReadStream(filepath);
+  var ws = fs.createWriteStream(SECRET_PATH);
+
+  rs.pipe(ws, { end: false });
+  rs.on('end', function() {
+    ws.end();
+    cb(null, { status: 'ok' });
+  });
+};
 
 /**
  * Call an Apps Script function to list the folders in the user's root

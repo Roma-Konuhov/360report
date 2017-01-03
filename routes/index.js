@@ -31,6 +31,7 @@ var managerController = require('../controllers/manager');
 var relationController = require('../controllers/relation');
 var userController = require('../controllers/user');
 var exportController = require('../controllers/export');
+var authController = require('../controllers/auth');
 
 /*
  * Routes
@@ -48,6 +49,7 @@ module.exports = function(app) {
   app.post('/publish/subordinates/:lmId', userController.publishSubordinateReportsPost);
   app.post('/publish/reviewee/:revieweeId', userController.publishRevieweeReportPost);
   app.post('/publish/all/', userController.publishAllReportsPost);
+  app.get('/authorize', authController.authorize);
 
   app.get('/reviewees-by-consultants', consultantController.revieweesGet);
   app.get('/consultant/report/:id', consultantController.reportGet);

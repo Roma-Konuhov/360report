@@ -26,6 +26,10 @@ export function publishReport(revieweeId) {
         return response.json().then((json) => {
           dispatch(success(json.message));
         });
+      } else if (response.status == 401) {
+        return response.json().then((json) => {
+          location.href = json.authUrl;
+        });
       } else {
         return response.json().then((json) => {
           dispatch(fail(json.message));
