@@ -150,6 +150,13 @@ function storeToken(token) {
  * @param cb
  */
 exports.storeCredentials = function(filepath, cb) {
+  try {
+    fs.mkdirSync(SECRET_DIR);
+  } catch (err) {
+    if (err.code !== 'EEXIST') {
+      throw err;
+    }
+  }
   var rs = fs.createReadStream(filepath);
   var ws = fs.createWriteStream(SECRET_PATH);
 
