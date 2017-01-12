@@ -8,7 +8,7 @@ class PersonalStatistics extends React.Component {
     this.propsDbToScreenMap = {
       'self_score': 'Self score',
       'avg_score': 'Avg score',
-      'avg_norm': 'Avg norm',
+      'avg_norm': 'Comp avg',
       'self_gap': 'Self gap',
       'avg_gap': 'Avg gap'
     };

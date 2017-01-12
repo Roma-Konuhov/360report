@@ -26,7 +26,8 @@ var reviewFields = {
   allow_to_share: { type: Boolean, default: false },
   relation: { type: Number, default: -1 },
   i_suggest: String,
-  i_appreciate: String
+  i_appreciate: String,
+  prof_skills_improvement: String,
 };
 
 var questionFields = {};

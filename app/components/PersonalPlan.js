@@ -18,19 +18,43 @@ class PersonalPlan extends Component {
             <tr>
               <td><span>Cogniance DNA</span></td>
               <td></td>
-              <td></td>
+              <td>
+                <table className="subtable">
+                  <tbody>
+                    <tr><td>On-the-job activities, development work tasks:</td></tr>
+                    <tr><td>Learning from others (coaching, mentoring):</td></tr>
+                    <tr><td>Training, seminars, readings:</td></tr>
+                  </tbody>
+                </table>
+              </td>
               <td></td>
             </tr>
             <tr>
               <td><span>Leadership</span></td>
               <td></td>
-              <td></td>
+              <td>
+                <table className="subtable">
+                  <tbody>
+                    <tr><td>On-the-job activities, development work tasks:</td></tr>
+                    <tr><td>Learning from others (coaching, mentoring):</td></tr>
+                    <tr><td>Training, seminars, readings:</td></tr>
+                  </tbody>
+                </table>
+              </td>
               <td></td>
             </tr>
             <tr>
               <td><span>Professional</span></td>
               <td></td>
-              <td></td>
+              <td>
+                <table className="subtable">
+                  <tbody>
+                    <tr><td>On-the-job activities, development work tasks:</td></tr>
+                    <tr><td>Learning from others (coaching, mentoring):</td></tr>
+                    <tr><td>Training, seminars, readings:</td></tr>
+                  </tbody>
+                </table>
+              </td>
               <td></td>
             </tr>
           </tbody>

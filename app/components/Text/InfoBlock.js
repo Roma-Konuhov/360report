@@ -4,6 +4,9 @@ class InfoBlock extends React.Component {
   render() {
     return (
       <div className="block">
+        <div className="legend">
+          <img src="img/legend.png" />
+        </div>
         <p>
           This confidential 360° feedback report has been generated using information gathered both from yourself and from the cremates who have provided feedback. It summarizes how you have been rated by your various (groups of) raters on each of the relevant competencies.
         </p>

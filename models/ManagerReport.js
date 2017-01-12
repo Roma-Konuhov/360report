@@ -28,6 +28,7 @@ var CSV_TO_DB_MAP = {
   'Share my answers': 'allow_to_share',
   'I suggest you to': 'i_suggest',
   'I appreciate you for': 'i_appreciate',
+  'Professional skills improvement': 'prof_skills_improvement',
 };
 
 questions.forEach(function(question, idx) {
@@ -41,6 +42,7 @@ var validationRules = {
   'allow_to_share': validRule.any().optional(),
   'i_suggest': validRule.any().optional(),
   'i_appreciate': validRule.any().optional(),
+  'prof_skills_improvement': validRule.any().optional(),
 };
 questions.forEach(function(question, idx) {
   validationRules['q' + (1 + idx)] = validRule.string().required();

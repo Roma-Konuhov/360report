@@ -93,6 +93,29 @@ class Report extends React.Component {
     });
   }
 
+  getProfSkillsImprovements(items) {
+    return items.map(item => {
+      return {
+        suggestion: item.prof_skills_improvement,
+        allow_to_share: item.allow_to_share,
+        responder: item.responder,
+      }
+    });
+  }
+
+  renderAfterChart(report) {
+    if (report.text !== "Demonstrates strong professional skills & knowledge") {
+      return null;
+    }
+    return (
+      <div className="block-after-report">
+        <Display if={_.some(this.props.suggestions, (item) => item.prof_skills_improvement.length )}>
+          <Suggestions data={this.getProfSkillsImprovements(this.props.suggestions)} title="Textual comments about professional skills & knowledge" />
+        </Display>
+      </div>
+    );
+  }
+
   render() {
     return (
       <div>
@@ -117,6 +140,7 @@ class Report extends React.Component {
                 avgValuesOptions={this.getFormattedAvgValues(this.props.statistics[idx])}
               />
             </div>
+            {this.renderAfterChart(report)}
             </div>
           )
         })}
