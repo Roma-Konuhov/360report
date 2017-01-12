@@ -101,12 +101,30 @@ html
       }
       #personal-dev-plan table tbody td:first-child {
         background: #3c3c3c !important;
-        width: 140px !important;
+        width: 160px !important;
       }
       #personal-dev-plan table tbody td:first-child span {
         color: #ffffff !important;
         text-align: center !important;
         vertical-align: middle !important;
+        height: 250px !important;
+        writing-mode: vertical-lr !important;
+        text-orientation: upright !important;
+        position: relative !important;
+        left: 12px !important;
+      }
+
+      #personal-dev-plan table .subtable {
+        height: 250px !important;
+        color: #333 !important;
+        margin: 0 !important;
+        font-weight: normal !important;
+      }
+      #personal-dev-plan table .subtable thead td,
+      #personal-dev-plan table .subtable tbody td {
+        vertical-align: top !important;
+        background: none !important;
+        border: 0 !important;
       }
 body
     #app!= html
