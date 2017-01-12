@@ -227,11 +227,8 @@ managerReportSchema.statics.getReviewees = function(cb) {
  *      },
  *      ...
  *    ],
- *    ...
- *    q1: {
- *      answer: <int>                           // summary answer per responders with the same role
- *      text: <string>                          // question label
- *    },
+      num_of_responders_with_answer1: 1,
+ *    q1: <int>                                 // summary answer per responders with the same role
  *    ...
  *  }
  * ...
@@ -254,6 +251,8 @@ managerReportSchema.statics.getReport = function(userId, cb) {
   for (var i = 1; i <= questions.length; i++) {
     groupQuery['$group']['q' + i] = {$sum: '$q' + i};
     groupQuery['$group']['answers' + i] = {$push: {answer: '$q' + i, responder: "$responder"}};
+    // we should not takw into account answers "Don't know" (value 0)
+    groupQuery['$group']['num_of_responders_with_answer' + i] = {$sum: {$cond: [{"$gt": ['$q' + i, 0 ]}, 1, 0 ]} };
   }
 
   var query = [
@@ -413,7 +412,6 @@ managerReportSchema.statics.regroupBySeries = function(reports, cb) {
   ManagerQuestion.find({}, function(err, questions) {
     questions.forEach(function(question) {
       var sumAnswer = 0;
-      var avgAnswer = 0;
       var orderIdx;
       qObject = {
         text: question.text,
@@ -423,11 +421,14 @@ managerReportSchema.statics.regroupBySeries = function(reports, cb) {
         avgAnswers: {},
         respondersNumber: {}
       };
-      reports.forEach(function(report) {
+      reports.forEach(function(report, i) {
         // skip reports of responders who doesn't have any relation with reviewee
+        var avgAnswer = 0;
         if (report._id.relation !== -1) {
           sumAnswer = report[question.q];
-          avgAnswer = parseFloat((sumAnswer / report.num_of_responders).toFixed(AVG_DECIMAL_PRECISION));
+          if (report['num_of_responders_with_answer' + (i + 1)] != 0) {
+            avgAnswer = parseFloat((sumAnswer / report['num_of_responders_with_answer' + (i + 1)]).toFixed(AVG_DECIMAL_PRECISION));
+          }
           orderIdx = report._id.relation;
           qObject['answers'][orderIdx] = sumAnswer;
           qObject['avgAnswers'][orderIdx] = avgAnswer;
@@ -487,14 +488,10 @@ managerReportSchema.statics.getStatistics = function(userId, cb) {
       avgScore = results.respondersAvg.length ? results.respondersAvg[0]['avg_score' + i] : 0;
       avgNorm = results.companyAvg.length ? results.companyAvg[0]['avg_norm' + i] : 0;
 
-      selfScore = selfScore.toFixed(AVG_DECIMAL_PRECISION);
-      avgScore = avgScore.toFixed(AVG_DECIMAL_PRECISION);
-      avgNorm = avgNorm.toFixed(AVG_DECIMAL_PRECISION);
-
       data.push({
-        self_score: selfScore,
-        avg_score: avgScore,
-        avg_norm: avgNorm,
+        self_score: selfScore.toFixed(AVG_DECIMAL_PRECISION),
+        avg_score: avgScore.toFixed(AVG_DECIMAL_PRECISION),
+        avg_norm: avgNorm.toFixed(AVG_DECIMAL_PRECISION),
         self_gap: (selfScore - avgScore).toFixed(AVG_DECIMAL_PRECISION),
         avg_gap: (avgNorm - avgScore).toFixed(AVG_DECIMAL_PRECISION)
       });

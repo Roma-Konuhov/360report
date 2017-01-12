@@ -109,7 +109,7 @@ class Report extends React.Component {
     }
     return (
       <div className="block-after-report">
-        <Display if={_.some(this.props.suggestions, (item) => item.prof_skills_improvement.length )}>
+        <Display if={_.some(this.props.suggestions, (item) => item.prof_skills_improvement && item.prof_skills_improvement.length )}>
           <Suggestions data={this.getProfSkillsImprovements(this.props.suggestions)} title="Textual comments about professional skills&knowledge" />
         </Display>
       </div>
