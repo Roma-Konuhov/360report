@@ -27,7 +27,15 @@ class PersonalPlan extends Component {
                   </tbody>
                 </table>
               </td>
-              <td></td>
+              <td>
+                <table className="subtable">
+                  <tbody>
+                  <tr><td>S.M.A.R.T.:</td></tr>
+                  <tr><td></td></tr>
+                  <tr><td></td></tr>
+                  </tbody>
+                </table>
+              </td>
             </tr>
             <tr>
               <td><span>Leadership</span></td>
@@ -41,7 +49,15 @@ class PersonalPlan extends Component {
                   </tbody>
                 </table>
               </td>
-              <td></td>
+              <td>
+                <table className="subtable">
+                  <tbody>
+                  <tr><td>S.M.A.R.T.:</td></tr>
+                  <tr><td></td></tr>
+                  <tr><td></td></tr>
+                  </tbody>
+                </table>
+              </td>
             </tr>
             <tr>
               <td><span>Professional</span></td>
@@ -55,7 +71,15 @@ class PersonalPlan extends Component {
                   </tbody>
                 </table>
               </td>
-              <td></td>
+              <td>
+                <table className="subtable">
+                  <tbody>
+                  <tr><td>S.M.A.R.T.:</td></tr>
+                  <tr><td></td></tr>
+                  <tr><td></td></tr>
+                  </tbody>
+                </table>
+              </td>
             </tr>
           </tbody>
         </table>
