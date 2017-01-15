@@ -22,8 +22,8 @@ exports.exportFile = function(url, filepath, cb = _.identity()) {
         page.setting('javascriptEnabled', true),
         page.setting('loadPlugins', false),
         page.property("zoomFactor", 1),
-        //page.property("viewportSize", { width: 800, height: 2400  }),
-        //page.property("paperSize", {format: "A5", orientation: 'landscape', margin: '1cm'}),
+        // page.property("viewportSize", { width: 1170, height: 1670  }),
+        page.property("paperSize", {format: "A3", orientation: 'portrait', margin: '1cm'}),
       ]);
     })
     .then(function () {

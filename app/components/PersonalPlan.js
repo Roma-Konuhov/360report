@@ -3,7 +3,7 @@ import React, { PropTypes, Component } from 'react';
 class PersonalPlan extends Component {
   render() {
     return (
-      <div id="personal-dev-plan">
+      <div style={{'page-break-inside': 'avoid'}} id="personal-dev-plan">
         <h4>Personal Development Plan</h4>
         <table>
           <thead>
