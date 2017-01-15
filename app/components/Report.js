@@ -126,7 +126,7 @@ class Report extends React.Component {
         <UserData user={this.props.user} />
         {this.props.reports.map((report, idx) => {
           return (
-            <div style={{'page-break-before': 'avoid'}} key={`chart-wrapper-${idx}`} className="chart-block">
+            <div style={{'page-break-inside': 'avoid'}} key={`chart-wrapper-${idx}`} className="chart-block">
               <Display if={this.props.statistics[idx]}>
                 <PersonalStatistics data={this.props.statistics[idx]} />
               </Display>

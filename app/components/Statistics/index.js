@@ -18,7 +18,7 @@ class Statistics extends React.Component {
 
   render() {
     return (
-      <div className="statistics">
+      <div style={{'page-break-inside': 'avoid'}} className="statistics">
         <Table
           data={this.props.data}
           columns={this.columns}
