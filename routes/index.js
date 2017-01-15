@@ -63,4 +63,15 @@ module.exports = function(app) {
   app.get('/manager/statistics/:id', managerController.statisticsGet);
   app.post('/manager/export/:format/:id', managerController.exportFilePost);
   app.post('/manager/export/bulk/:format/:id', managerController.exportBulkPost);
+
+  app.put('/account', authController.ensureAuthenticated, authController.accountPut);
+  app.delete('/account', authController.ensureAuthenticated, authController.accountDelete);
+  app.post('/signup', authController.signupPost);
+  app.post('/login', authController.loginPost);
+  app.post('/forgot', authController.forgotPost);
+  app.post('/reset/:token', authController.resetPost);
+  app.get('/unlink/:provider', authController.ensureAuthenticated, authController.unlink);
+  app.post('/auth/google', authController.authGoogle);
+  app.get('/auth/google/callback', authController.authGoogleCallback);
+
 };

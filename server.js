@@ -7,6 +7,7 @@ var compression = require('compression');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
+var dotenv = require('dotenv');
 var React = require('react');
 var ReactDOM = require('react-dom/server');
 var Router = require('react-router');
@@ -22,12 +23,16 @@ var sendHttpError = require('./middleware/sendHttpError');
 var HttpError = require('./lib/error').HttpError;
 var errorHandler = require('errorhandler');
 
+// Load environment variables from .env file
+dotenv.load();
+
 // ES6 Transpiler
 require('babel-core/register');
 require('babel-polyfill');
 
 var app = express();
 var compiler = webpack(webpackConfig);
+
 
 if (app.get('env') === 'development') {
   app.use(require('webpack-dev-middleware')(compiler, {
@@ -46,6 +51,7 @@ require('./db');
 
 // Models
 var User = require('./models/User');
+var Auth = require('./models/Auth');
 
 // React and Server-Side Rendering
 var routes = require('./app/routes');
@@ -63,6 +69,32 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 require('./routes')(app);
+
+app.use(function(req, res, next) {
+  req.isAuthenticated = function() {
+    var token = (req.headers.authorization && req.headers.authorization.split(' ')[1]) || req.cookies.token;
+    try {
+      return jwt.verify(token, process.env.TOKEN_SECRET);
+    } catch (err) {
+      return false;
+    }
+  };
+
+  console.log('isAuthenticated',req.isAuthenticated(), req.url)
+  if (!req.isAuthenticated()) {
+    var payload = req.isAuthenticated();
+    Auth.findById(payload.sub, function(err, user) {
+      console.log('isAuthenticated',err, user)
+      if (!user && req.url !== '/login') {
+        return res.redirect('/login');
+      }
+      req.user = user;
+      next();
+    });
+  } else {
+    next();
+  }
+});
 
 // React server rendering
 app.use(function(req, res) {

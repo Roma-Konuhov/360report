@@ -39,7 +39,10 @@
       "google_api_credentials"
     ]
   },
+
   "google": {
+    "secret": "SyXmZcdT6vPFeqcs0jaPhdVP",
+    "token_secret": "ffd58ba52dcc87bc6c38944a05f6b6b065675622d2abc7b5522f39d08fdba112",
     "reportDirectory": "360 results",
     "api": {
       "credentials": {
