@@ -410,7 +410,7 @@ managerReportSchema.statics.regroupBySeries = function(reports, cb) {
   var qObject = {};
 
   ManagerQuestion.find({}, function(err, questions) {
-    questions.forEach(function(question) {
+    questions.forEach(function(question, i) {
       var sumAnswer = 0;
       var orderIdx;
       qObject = {
@@ -421,12 +421,13 @@ managerReportSchema.statics.regroupBySeries = function(reports, cb) {
         avgAnswers: {},
         respondersNumber: {}
       };
-      reports.forEach(function(report, i) {
+      reports.forEach(function(report) {
         // skip reports of responders who doesn't have any relation with reviewee
         var avgAnswer = 0;
         if (report._id.relation !== -1) {
           sumAnswer = report[question.q];
           if (report['num_of_responders_with_answer' + (i + 1)] != 0) {
+            logger.info('q %d: %d', (i+1), report['num_of_responders_with_answer' + (i + 1)])
             avgAnswer = parseFloat((sumAnswer / report['num_of_responders_with_answer' + (i + 1)]).toFixed(AVG_DECIMAL_PRECISION));
           }
           orderIdx = report._id.relation;

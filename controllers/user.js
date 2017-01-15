@@ -158,7 +158,6 @@ exports.publishRevieweeReportPost = function(req, res, next) {
   logger.info('publish reviewes\'s report to its LM on Google drive');
 
   const auth = gApi.checkAuth();
-  logger.error('unauthorized', auth)
   if (auth.status === 'unauthorized') {
     return res.status(401).json({ authUrl: auth.authUrl });
   }
@@ -304,7 +303,19 @@ exports.publishAllReportsPost = function(req, res, next) {
       return next(new HttpError(400, err.message));
     }
 
+/*
+    var startIdx;
+    lms = lms.filter((lm, idx) => {
+      logger.info(lm.name, lm.email)
+      if (lm.email === 'mgoncharenko@cogniance.com') {
+        startIdx = idx;
+      }
+      return startIdx !== undefined && startIdx <= idx;
+    });
+*/
+
     lms.forEach(function(lm, idx) {
+      setTimeout(function() {
       publishSubordinateReports(lm.data._id, res, function(err, result) {
         if (err) {
           errors = errors.concat(err.message);
@@ -318,7 +329,7 @@ exports.publishAllReportsPost = function(req, res, next) {
           }
           res.json({ message: successMessages });
         }
-      });
+      });}, 30000 * idx);
     });
   });
 };
