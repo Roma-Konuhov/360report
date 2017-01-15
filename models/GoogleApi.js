@@ -81,10 +81,15 @@ function isAuthorized(credentials) {
   try {
     // Check if we have previously stored a token.
     // If file doesn't exist then exception will be thrown
-    const token = fs.readFileSync(TOKEN_PATH, { encoding: 'utf-8' });
+    var token = fs.readFileSync(TOKEN_PATH, { encoding: 'utf-8' });
+    token = JSON.parse(token);
+    logger.info('Token exists: %j', token);
+    if (new Date(token.expiry_date) < new Date()) {
+      throw new Error({ message: `Token is expired at ${new Date(token.expiry_date)}` });
+    }
     // else token exists and can be used
     logger.info('Authorization success. Token: %j', token);
-    oauth2Client.credentials = JSON.parse(token);
+    oauth2Client.credentials = token;
     google.options({
       auth: oauth2Client
     });
@@ -92,7 +97,7 @@ function isAuthorized(credentials) {
     return { status: 'ok' };
 
   } catch (e) {
-    logger.info('Authorization failed');
+    logger.error('Authorization failed: %s', e.message);
     var authUrl = oauth2Client.generateAuthUrl({
       access_type: 'online',
       scope: config.get('google:api:scopes')

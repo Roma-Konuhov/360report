@@ -1,6 +1,6 @@
 import moment from 'moment';
 import cookie from 'react-cookie';
-import { browserHistory } from 'react-router';
+import { hashHistory } from 'react-router';
 
 export function login(email, password) {
   return (dispatch) => {
@@ -23,7 +23,7 @@ export function login(email, password) {
             user: json.user
           });
           cookie.save('token', json.token, { expires: moment().add(1, 'hour').toDate() });
-          browserHistory.push('/account');
+          hashHistory.push('/account');
         });
       } else {
         return response.json().then((json) => {
@@ -54,7 +54,7 @@ export function signup(name, email, password) {
             token: json.token,
             user: json.user
           });
-          browserHistory.push('/');
+          hashHistory.push('/');
           cookie.save('token', json.token, { expires: moment().add(1, 'hour').toDate() });
         } else {
           dispatch({
@@ -69,7 +69,7 @@ export function signup(name, email, password) {
 
 export function logout() {
   cookie.remove('token');
-  browserHistory.push('/');
+  hashHistory.push('/');
   return {
     type: 'LOGOUT_SUCCESS'
   };
@@ -119,7 +119,7 @@ export function resetPassword(password, confirm, pathToken) {
     }).then((response) => {
       if (response.ok) {
         return response.json().then((json) => {
-          browserHistory.push('/login');
+          hashHistory.push('/login');
           dispatch({
             type: 'RESET_PASSWORD_SUCCESS',
             messages: [json]

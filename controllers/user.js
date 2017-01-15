@@ -158,6 +158,7 @@ exports.publishRevieweeReportPost = function(req, res, next) {
   logger.info('publish reviewes\'s report to its LM on Google drive');
 
   const auth = gApi.checkAuth();
+  logger.error('unauthorized', auth)
   if (auth.status === 'unauthorized') {
     return res.status(401).json({ authUrl: auth.authUrl });
   }

@@ -70,7 +70,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 require('./routes')(app);
 
-app.use(function(req, res, next) {
+/*app.use(function(req, res, next) {
+  const url = require('url');
   req.isAuthenticated = function() {
     var token = (req.headers.authorization && req.headers.authorization.split(' ')[1]) || req.cookies.token;
     try {
@@ -80,21 +81,22 @@ app.use(function(req, res, next) {
     }
   };
 
-  console.log('isAuthenticated',req.isAuthenticated(), req.url)
+  logger.warn('isAuthenticated: %s',req.url)
   if (!req.isAuthenticated()) {
     var payload = req.isAuthenticated();
     Auth.findById(payload.sub, function(err, user) {
-      console.log('isAuthenticated',err, user)
-      if (!user && req.url !== '/login') {
-        return res.redirect('/login');
+      logger.info('isAuthenticated: %j', req.url)
+      if (!user) {
+          return res.redirect('/#/login');//(new HttpError(401));
+      } else {
+        req.user = user;
+        next();
       }
-      req.user = user;
-      next();
     });
   } else {
     next();
   }
-});
+});*/
 
 // React server rendering
 app.use(function(req, res) {

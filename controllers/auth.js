@@ -1,8 +1,12 @@
 var HttpError = require('../lib/error').HttpError;
 var User = require('../models/User');
+var HttpError = require('../lib/error').HttpError;
 var logger = require('../lib/logger')(module);
 var config = require('../config');
 var gApi = require('../models/GoogleApi');
+var fs = require('fs');
+var google = require('googleapis');
+var googleAuth = require('google-auth-library');
 
 exports.authorize = function(req, res, next) {
   gApi.approveAuth(req.query.code, function(err, oauth2Client) {
@@ -299,20 +303,33 @@ exports.resetPost = function(req, res, next) {
  * POST /auth/google
  * Sign in with Google
  */
-exports.authGoogle = function(req, res) {
+exports.authGoogle = function(req, res, next) {
   var accessTokenUrl = 'https://accounts.google.com/o/oauth2/token';
   var peopleApiUrl = 'https://www.googleapis.com/plus/v1/people/me/openIdConnect';
 
+  try {
+    var credentials = JSON.parse(fs.readFileSync(config.get('google:api:credentials:directory')));
+  } catch (err) {
+    return next(new HttpError(400, err.message))
+  }
+
   var params = {
     code: req.body.code,
-    client_id: req.body.clientId,
-    client_secret: process.env.GOOGLE_SECRET,
-    redirect_uri: req.body.redirectUri,
+    client_id: credentials.client_id,
+    client_secret: credentials.client_secret,
+    redirect_uri: credentials.redirect_uris[0],
     grant_type: 'authorization_code'
   };
 
+  var auth = new googleAuth();
+  var oauth2Client = new auth.OAuth2(clientId, credentials.client_secret, credentials.redirect_uris[0]);
+  var authUrl = oauth2Client.generateAuthUrl({
+    access_type: 'online',
+    scope: config.get('google:api:scopes')
+  });
+
   // Step 1. Exchange authorization code for access token.
-  request.post(accessTokenUrl, { json: true, form: params }, function(err, response, token) {
+  request.post(authUrl, { json: true }, function(err, response, token) {
     var accessToken = token.access_token;
     var headers = { Authorization: 'Bearer ' + accessToken };
 
